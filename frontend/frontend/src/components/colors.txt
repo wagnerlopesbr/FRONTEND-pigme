@@ -1,0 +1,6 @@
+background color: #e8ecf4
+register background color: #FFE84C
+placeholder color: #848484
+input control color: #E0E0E0
+button color: #FFCA36
+button text color: #707018
