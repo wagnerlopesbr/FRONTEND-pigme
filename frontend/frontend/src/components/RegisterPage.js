@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   SafeAreaView,
   View,
-  Image,
   Text,
   TouchableOpacity,
   TextInput,
@@ -11,102 +10,141 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { registerUser } from '../utils/crud_actions';
 
+
+const validationSchema = Yup.object().shape({
+  username: Yup.string()
+    .required('Usuário é obrigatório')
+    .min(4, 'Usuário deve ter pelo menos 4 caracteres'),
+  email: Yup.string()
+    .required('Email é obrigatório')
+    .email('Email inválido'),
+  password: Yup.string()
+    .required('Senha é obrigatória')
+    .min(6, 'Senha deve ter pelo menos 6 caracteres'),
+});
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({
-    username: '',
-    email: '',
-    password: '',
-  });
-
   const navigation = useNavigation();
 
   function navigateTo(route) {
     navigation.navigate(route);
   }
 
+  const handleFormSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await registerUser(values);
+      console.log('Handle Success:', response);
+      navigateTo('login');
+    } catch (error) {
+      console.log(values);
+      console.error('Handle Error:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFE84C' }}>
       <View style={styles.container}>
         <KeyboardAwareScrollView>
           <View style={styles.header}>
-            <Image
+            <Animatable.Image
+              animation="flash"
+              delay={500}
               style={styles.headerImg}
               source={require('../assets/pigme icon.png')}
-              />
+            />
             <Text style={styles.title}>
               Crie sua conta na <Text style={{ color: '#FF9A00', fontWeight: '900' }}>Pigme</Text>
             </Text>
-
           </View>
 
-          
-
-          <View style={styles.form}>
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Usuário</Text>
-
-              <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                keyboardType="default"
-                onChangeText={username => setForm({ ...form, username })}
-                placeholder="Digite seu usuário"
-                placeholderTextColor="#848484"
-                style={styles.inputControl}
-                value={form.username} />
-            </View>
-
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Email</Text>
-
-              <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                keyboardType="email-address"
-                onChangeText={email => setForm({ ...form, email })}
-                placeholder="Digite seu email"
-                placeholderTextColor="#848484"
-                style={styles.inputControl}
-                value={form.email} />
-            </View>
-
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Senha</Text>
-
-              <TextInput
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                onChangeText={password => setForm({ ...form, password })}
-                placeholder="Digite sua senha"
-                placeholderTextColor="#848484"
-                style={styles.inputControl}
-                secureTextEntry={true}
-                value={form.password} />
-            </View>
-
-            <View style={styles.formAction}>
-              <TouchableOpacity
-                onPress={() => {
-                  // handle onPress
-                }}>
-                <View style={styles.btn}>
-                  <Text style={styles.btnText}>Cadastrar</Text>
+          <Formik
+            initialValues={{ username: '', email: '', password: '' }}
+            validationSchema={validationSchema}
+            onSubmit={handleFormSubmit}
+          >
+            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+              <View style={styles.form}>
+                <View style={styles.input}>
+                  <Text style={styles.inputLabel}>Usuário</Text>
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    clearButtonMode="while-editing"
+                    keyboardType="default"
+                    onChangeText={handleChange('username')}
+                    onBlur={handleBlur('username')}
+                    placeholder="Digite seu usuário"
+                    placeholderTextColor="#848484"
+                    style={styles.inputControl}
+                    value={values.username}
+                  />
+                  {touched.username && errors.username && (
+                    <Text style={styles.errorText}>{errors.username}</Text>
+                  )}
                 </View>
-              </TouchableOpacity>
-            </View>
-          </View>
+
+                <View style={styles.input}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    clearButtonMode="while-editing"
+                    keyboardType="email-address"
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    placeholder="Digite seu email"
+                    placeholderTextColor="#848484"
+                    style={styles.inputControl}
+                    value={values.email}
+                  />
+                  {touched.email && errors.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  )}
+                </View>
+
+                <View style={styles.input}>
+                  <Text style={styles.inputLabel}>Senha</Text>
+                  <TextInput
+                    autoCorrect={false}
+                    clearButtonMode="while-editing"
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    placeholder="Digite sua senha"
+                    placeholderTextColor="#848484"
+                    style={styles.inputControl}
+                    secureTextEntry={true}
+                    value={values.password}
+                  />
+                  {touched.password && errors.password && (
+                    <Text style={styles.errorText}>{errors.password}</Text>
+                  )}
+                </View>
+
+                <View style={styles.formAction}>
+                  <TouchableOpacity onPress={handleSubmit}>
+                    <View style={styles.btn}>
+                      <Text style={styles.btnText}>Cadastrar</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Formik>
         </KeyboardAwareScrollView>
 
         <TouchableOpacity
           onPress={() => {
-            navigateTo('login')
+            navigateTo('login');
           }}
-          style={styles.footer}>
+          style={styles.footer}
+        >
           <Text style={styles.formFooter}>
             <Icon name="arrow-back" size={20} color="black" />
           </Text>
@@ -161,12 +199,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
   },
-  formLink: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#D8A600',
-    textAlign: 'center',
-  },
   formFooter: {
     fontSize: 15,
     fontWeight: '600',
@@ -212,5 +244,11 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: '600',
     color: '#fff',
+  },
+  /** Error Text */
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: 5,
   },
 });

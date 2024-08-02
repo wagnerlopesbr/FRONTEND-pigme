@@ -3,75 +3,130 @@ import {
   StyleSheet,
   SafeAreaView,
   View,
-  Image,
   Text,
   TouchableOpacity,
   TextInput,
+  Modal,
+  Button,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
+
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Email inválido')
+    .required('Email é obrigatório'),
+});
 
 export default function RememberAccountPage() {
-  const [form, setForm] = useState({
-    email: ''
-  });
-
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(null);
 
   function navigateTo(route) {
     navigation.navigate(route);
   }
 
+  const showCustomAlert = (message) => {
+    setAlertMessage(message);
+    setModalVisible(true);
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#E2CEAF' }}>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <KeyboardAwareScrollView>
           <View style={styles.header}>
-            <Image
+            <Animatable.Image
+              animation="rubberBand"
               style={styles.headerImg}
               source={require('../assets/pigme knocked out.png')}
-              />
+            />
             <Text style={styles.title}>
               Recupere sua conta
             </Text>
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.input}>
-              <Text style={styles.inputLabel}>Email</Text>
-
-              <TextInput
-                autoCapitalize="none"
-                autoCorrect={false}
-                clearButtonMode="while-editing"
-                keyboardType="email-address"
-                onChangeText={email => setForm({ email })}
-                placeholder="Digite seu email"
-                placeholderTextColor="#848484"
-                style={styles.inputControl}
-                value={form.email} />
-            </View>
-
-            <View style={styles.formAction}>
-              <TouchableOpacity
-                onPress={() => {
-                  // handle onPress
-                }}>
-                <View style={styles.btn}>
-                  <Text style={styles.btnText}>Enviar</Text>
+          <Formik
+            initialValues={{ email: '' }}
+            validationSchema={validationSchema}
+            onSubmit={(values) => {
+              const emailMessage = (
+                <>
+                  <Text style={styles.modalText}>Email enviado para: </Text>
+                  <Text style={styles.modalMail}>
+                    {values.email}
+                  </Text>
+                </>
+              );
+              showCustomAlert(emailMessage);
+            }}
+          >
+            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+              <View style={styles.form}>
+                <View style={styles.input}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <TextInput
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    clearButtonMode="while-editing"
+                    keyboardType="email-address"
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    placeholder="Digite seu email"
+                    placeholderTextColor="#848484"
+                    style={styles.inputControl}
+                    value={values.email}
+                  />
+                  {touched.email && errors.email ? (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  ) : null}
                 </View>
-              </TouchableOpacity>
+
+                <View style={styles.formAction}>
+                  <TouchableOpacity onPress={handleSubmit}>
+                    <View style={styles.btn}>
+                      <Text style={styles.btnText}>Enviar</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Formik>
+
+          <Modal
+            visible={modalVisible}
+            transparent={true}
+            animationType="none"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                {alertMessage}
+                <Button
+                  title="     OK     "
+                  onPress={() => {
+                    setModalVisible(false)
+                    navigateTo('login');
+                  }}
+                  color="#FF4A36"
+                />
+              </View>
             </View>
-          </View>
+          </Modal>
         </KeyboardAwareScrollView>
 
         <TouchableOpacity
           onPress={() => {
-            navigateTo('login')
+            navigateTo('login');
           }}
-          style={styles.footer}>
+          style={styles.footer}
+        >
           <Text style={styles.formFooter}>
             <Icon name="arrow-back" size={20} color="black" />
           </Text>
@@ -82,6 +137,10 @@ export default function RememberAccountPage() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#E2CEAF',
+  },
   container: {
     paddingHorizontal: 0,
     flexGrow: 1,
@@ -128,12 +187,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
   },
-  formLink: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#D8A600',
-    textAlign: 'center',
-  },
   formFooter: {
     fontSize: 15,
     fontWeight: '600',
@@ -179,5 +232,38 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: '600',
     color: '#fff',
+  },
+  /** Error Text */
+  errorText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#FF4A36',
+    marginTop: 8,
+  },
+  /** Modal */
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 20,
+    width: '600',
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
+  modalMail: {
+    fontSize: 22,
+    marginBottom: 20,
+    textDecorationLine: 'underline',
+    color: 'blue',
   },
 });
