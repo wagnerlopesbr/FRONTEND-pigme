@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const colors = ['#FFABAB', '#FFC3A0', '#D5AAFF', '#A1C4FD', '#C2E6F4'];
 
-const TestComponent = () => {
+const ListsPage = () => {
   const items = Array.from({ length: 10 }, (_, index) => index + 1);
 
   return (
@@ -121,4 +121,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TestComponent;
+export default ListsPage;

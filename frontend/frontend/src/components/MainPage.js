@@ -2,7 +2,11 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Appbar } from 'react-native-paper';
-import TestComponent from './TestComponent';
+import ListsPage from './ListsPage';
+import ProfilePage from './ProfilePage';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -21,10 +25,16 @@ function Header({ username, onLogout }) {
 }
 
 export default function MainPage() {
+  const navigate = useNavigation();
+
+  const navigateTo = (route) => {
+    navigate.navigate(route);
+  }
   const username = 'Nome do Usuário';
 
   const handleLogout = () => {
     console.log('Logout');
+    navigateTo('login');
   };
 
   return (
@@ -38,9 +48,36 @@ export default function MainPage() {
           tabBarLabelStyle: styles.tabBarLabel,
         }}
       >
-        <Tab.Screen name="UserProfile" component={TestComponent} options={{ title: 'Perfil' } }/>
-        <Tab.Screen name="UserLists" component={TestComponent} options={{ title: 'Listas' }} />
-        <Tab.Screen name="CreateList" component={TestComponent} options={{ title: 'Criar Lista' }} />
+         <Tab.Screen 
+          name="UserProfile" 
+          component={ProfilePage} 
+          options={{ 
+            title: 'Perfil',
+            tabBarIcon: ({ size }) => (
+              <Icon name="person" size={size} color='black' />
+            ),
+          }} 
+        />
+        <Tab.Screen 
+          name="UserLists" 
+          component={ListsPage} 
+          options={{ 
+            title: 'Listas',
+            tabBarIcon: ({ size }) => (
+              <Icon name="newspaper" size={size} color='black' />
+            ),
+          }} 
+        />
+        <Tab.Screen 
+          name="Premium" 
+          component={ListsPage} 
+          options={{ 
+            title: 'Premium',
+            tabBarIcon: ({ size }) => (
+              <Icon name="star" size={size} color='black' />
+            ),
+          }} 
+        />
       </Tab.Navigator>
     </View>
   );
@@ -90,9 +127,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFCA36',
     borderTopWidth: 1,
     borderTopColor: '#FFCA36',
+    color: 'black',
   },
   tabBarLabel: {
     fontSize: 12,
     fontWeight: '600',
+    color: 'black',
+    paddingBottom: 2,
   },
 });
