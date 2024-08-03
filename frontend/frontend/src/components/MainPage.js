@@ -4,9 +4,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Appbar } from 'react-native-paper';
 import ListsPage from './ListsPage';
 import ProfilePage from './ProfilePage';
+import NotFoundPage from './notFoundPage';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-
+// import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,7 +31,9 @@ export default function MainPage() {
   const navigateTo = (route) => {
     navigate.navigate(route);
   }
+
   const username = 'Nome do Usuário';
+  const quantity = Array.from({ length: 10 }, (_, index) => index + 1);
 
   const handleLogout = () => {
     console.log('Logout');
@@ -48,29 +51,39 @@ export default function MainPage() {
           tabBarLabelStyle: styles.tabBarLabel,
         }}
       >
-         <Tab.Screen 
+        <Tab.Screen 
           name="UserProfile" 
           component={ProfilePage} 
           options={{ 
             title: 'Perfil',
             tabBarIcon: ({ size }) => (
-              <Icon name="person" size={size} color='black' />
+              <Icon name="account" size={size} color='black' />
             ),
           }} 
         />
         <Tab.Screen 
           name="UserLists" 
-          component={ListsPage} 
+          children={() => <ListsPage items={quantity} />} // Passando a lista como prop
           options={{ 
             title: 'Listas',
             tabBarIcon: ({ size }) => (
-              <Icon name="newspaper" size={size} color='black' />
+              <Icon name="beaker" size={size} color='black' />
+            ),
+          }} 
+        />
+        <Tab.Screen 
+          name="CreateList" 
+          component={NotFoundPage} 
+          options={{ 
+            title: 'Criar Lista',
+            tabBarIcon: ({ size }) => (
+              <Icon name="beaker-plus" size={size} color='black' />
             ),
           }} 
         />
         <Tab.Screen 
           name="Premium" 
-          component={ListsPage} 
+          component={NotFoundPage} 
           options={{ 
             title: 'Premium',
             tabBarIcon: ({ size }) => (
