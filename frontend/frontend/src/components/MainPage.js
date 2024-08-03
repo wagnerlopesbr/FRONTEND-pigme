@@ -1,15 +1,19 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, ScrollView, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Appbar } from 'react-native-paper';
-import ListsPage from './ListsPage';
+import ListCard from './ListCard';
+import NewListCard from './NewListCard';
 import ProfilePage from './ProfilePage';
 import NotFoundPage from './notFoundPage';
 import { useNavigation } from '@react-navigation/native';
-// import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Slide from './Slide';
+import * as Animatable from 'react-native-animatable';
+
 
 const Tab = createBottomTabNavigator();
+const { height } = Dimensions.get('window');
 
 function Header({ username, onLogout }) {
   return (
@@ -25,15 +29,71 @@ function Header({ username, onLogout }) {
   );
 }
 
+function UserListsScreen() {
+  // const items = Array.from({ length: 10 }, (_, index) => index + 1);
+  const [listCards, setListCards] = useState([1, 2, 3]);
+
+  const navigate = useNavigation();
+  const navigateTo = (route) => {navigate.navigate(route)};
+
+  const handleEdit = (item) => {
+    console.log(`Editar Lista ${item}`);
+  };
+
+  const handleBuy = (item) => {
+    console.log(`Comprar Lista ${item}`);
+  };
+
+  // const addListCard = () => {
+  //   if (listCards.length < 10) {
+  //     setListCards([...listCards, listCards.length + 1]);
+  //   }
+  // };
+
+  const test_isPremium = false;
+
+  return (
+    <View style={styles.userListsContainer}>
+      <ScrollView contentContainerStyle={styles.listContainer} style={styles.scrollView}>
+        {listCards.slice(0, 10).map((item, index) => (
+          <ListCard
+            key={item}
+            item={item}
+            isPremium={index >= 3}
+            onEdit={handleEdit}
+            onBuy={handleBuy}
+          />
+        ))}
+        {listCards.length < 10 && (
+          <NewListCard isPremium={listCards.length <= 2 ? false : true} />
+        )}
+      </ScrollView>
+      {!test_isPremium &&
+        <Animatable.Text
+          animation="pulse"
+          duration={1000}
+          style={styles.button}
+          iterationCount="infinite"
+          direction="alternate"
+          onPress={() => navigateTo('not-found-page')}
+        >
+          <Text style={styles.buttonText}>Comprar Premium</Text>
+        </Animatable.Text>
+        // <TouchableOpacity style={styles.button} onPress={() => navigateTo('not-found-page')}>
+        //  <Text style={styles.buttonText}>Comprar Premium</Text>
+        // </TouchableOpacity>
+      }
+      {!test_isPremium && <Slide />}
+    </View>
+  );
+}
+
 export default function MainPage() {
   const navigate = useNavigation();
 
   const navigateTo = (route) => {
     navigate.navigate(route);
   }
-
-  const username = 'Nome do Usuário';
-  const quantity = Array.from({ length: 10 }, (_, index) => index + 1);
 
   const handleLogout = () => {
     console.log('Logout');
@@ -42,7 +102,7 @@ export default function MainPage() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Header username={username} onLogout={handleLogout} />
+      <Header username={'Nome do Usuário'} onLogout={handleLogout} />
       <Tab.Navigator
         initialRouteName='UserLists'
         screenOptions={{
@@ -63,21 +123,11 @@ export default function MainPage() {
         />
         <Tab.Screen 
           name="UserLists" 
-          children={() => <ListsPage items={quantity} />} // Passando a lista como prop
+          component={UserListsScreen} 
           options={{ 
             title: 'Listas',
             tabBarIcon: ({ size }) => (
               <Icon name="beaker" size={size} color='black' />
-            ),
-          }} 
-        />
-        <Tab.Screen 
-          name="CreateList" 
-          component={NotFoundPage} 
-          options={{ 
-            title: 'Criar Lista',
-            tabBarIcon: ({ size }) => (
-              <Icon name="beaker-plus" size={size} color='black' />
             ),
           }} 
         />
@@ -97,6 +147,39 @@ export default function MainPage() {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: '#FF005E',
+    width: '93%',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    marginTop: 5,
+    elevation: 30,
+    bottom: -8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  userListsContainer: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  listContainer: {
+    paddingHorizontal: 15,
+    paddingTop: 15,
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
   headerContainer: {
     backgroundColor: '#FFE84C',
     flexDirection: 'row',

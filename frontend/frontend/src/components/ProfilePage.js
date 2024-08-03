@@ -80,7 +80,7 @@ export default function ProfilePage() {
         <Icon
           name="star"
           size={24}
-          color={profile.isPremium ? 'orange' : 'red'}
+          color={profile.isPremium ? 'orange' : 'gray'}
         />
       </View>
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

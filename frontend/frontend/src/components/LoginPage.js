@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -44,6 +44,10 @@ export default function LoginPage() {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#e8ecf4' }}>

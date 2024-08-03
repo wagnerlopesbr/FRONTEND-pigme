@@ -16,9 +16,9 @@ const NotFoundPage = () => {
       <Text style={styles.title}>
         Página em construção
       </Text>
-      <TouchableOpacity style={styles.saveButton} onPress={() => navigateTo('UserLists')}>
+      <TouchableOpacity style={styles.button} onPress={() => navigateTo('UserLists')}>
         <Icon name="arrow-back" size={25} color="#fff" />
-        <Text style={styles.saveButtonText}>Voltar</Text>
+        <Text style={styles.buttonText}>Voltar</Text>
       </TouchableOpacity>
     </View>
   );
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: '100%',
   },
-  saveButton: {
+  button: {
     backgroundColor: 'gray',
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 5,
   },
-  saveButtonText: {
+  buttonText: {
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
