@@ -24,7 +24,8 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "API_URL": "https://backend-pigme.up.railway.app/api/"
+      "BACKEND_CRUD_URL": "https://backend-pigme.up.railway.app/api/",
+      "API_PRODUCTS_URL": "https://supermarket-products-api.up.railway.app/api/dev/"
     }
   }
 }

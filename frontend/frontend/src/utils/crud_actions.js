@@ -1,15 +1,15 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig.extra?.API_URL;
+const BACKEND_CRUD_URL = Constants.expoConfig.extra?.BACKEND_CRUD_URL;
 
 const registerUser = async (userData) => {
   try {
-    if (!API_URL) {
-      throw new Error('API_URL não está definida nas constantes de configuração.');
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
     }
 
-    const response = await axios.post(`${API_URL}register/`, userData);
+    const response = await axios.post(`${BACKEND_CRUD_URL}register/`, userData);
     return response.data;
   } catch (error) {
     console.error('Erro ao registrar usuário:', error.message || error);
@@ -19,11 +19,11 @@ const registerUser = async (userData) => {
 
 const loginUser = async (userData) => {
   try {
-    if (!API_URL) {
-      throw new Error('API_URL não está definida nas constantes de configuração.');
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
     }
 
-    const response = await axios.post(`${API_URL}login/`, userData);
+    const response = await axios.post(`${BACKEND_CRUD_URL}login/`, userData);
     return response.data;
   } catch (error) {
     console.error('Erro ao logar usuário:', error.message || error);
@@ -33,11 +33,11 @@ const loginUser = async (userData) => {
 
 const getUser = async (token) => {
   try {
-    if (!API_URL) {
-      throw new Error('API_URL não está definida nas constantes de configuração.');
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
     }
 
-    const response = await axios.get(`${API_URL}accounts/`, {
+    const response = await axios.get(`${BACKEND_CRUD_URL}accounts/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -51,11 +51,11 @@ const getUser = async (token) => {
 
 const getLists = async (token) => {
   try {
-    if (!API_URL) {
-      throw new Error('API_URL não está definida nas constantes de configuração.');
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
     }
 
-    const response = await axios.get(`${API_URL}accounts/lists/`, {
+    const response = await axios.get(`${BACKEND_CRUD_URL}accounts/lists/`, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -67,13 +67,31 @@ const getLists = async (token) => {
   }
 };
 
-const createList = async (listData, token) => {
+const getPkList = async (listId, token) => {
   try {
-    if (!API_URL) {
-      throw new Error('API_URL não está definida nas constantes de configuração.');
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
     }
 
-    const response = await axios.post(`${API_URL}lists/`, listData, {
+    const response = await axios.get(`${BACKEND_CRUD_URL}lists/${listId}/`, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar lista:', error.message || error);
+    throw error;
+  }
+};
+
+const createList = async (listData, token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+
+    const response = await axios.post(`${BACKEND_CRUD_URL}lists/`, listData, {
       headers: {
         Authorization: `Token ${token}`,
         'Content-Type': 'application/json',
@@ -86,4 +104,23 @@ const createList = async (listData, token) => {
   }
 };
 
-export { registerUser, loginUser, createList, getLists, getUser };
+const updateList = async (listId, listData, token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+
+    const response = await axios.put(`${BACKEND_CRUD_URL}lists/${listId}/`, listData, {
+      headers: {
+        Authorization: `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar lista:', error.message || error);
+    throw error;
+  }
+};
+
+export { registerUser, loginUser, createList, getLists, getUser, updateList, getPkList };

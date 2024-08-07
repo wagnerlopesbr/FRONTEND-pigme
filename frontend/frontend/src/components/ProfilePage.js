@@ -8,7 +8,7 @@ import { userAtom } from '../utils/jotai';
 export default function ProfilePage() {
   const [user] = useAtom(userAtom);
   const navigation = useNavigation();
-  const navigateTo = (route) => navigation.navigate(route);
+  const navigateTo = (route, params = {}) => { navigate.navigate(route, params) };
   const [profile, setProfile] = useState({
     firstName: user.first_name || '',
     lastName: user.last_name || '',

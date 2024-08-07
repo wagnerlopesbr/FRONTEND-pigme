@@ -33,9 +33,7 @@ export default function MainPage() {
   const navigate = useNavigation();
   const [user] = useAtom(userAtom);
 
-  const navigateTo = (route) => {
-    navigate.navigate(route);
-  }
+  const navigateTo = (route, params = {}) => { navigate.navigate(route, params) };
 
   const handleLogout = () => {
     console.log('Logout');
