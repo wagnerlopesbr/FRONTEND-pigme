@@ -5,6 +5,7 @@ import RememberAccountPage from './components/RememberAccountPage'
 import MainPage from './components/MainPage'
 import CreateList from './components/CreateList'
 import NotFoundPage from './components/notFoundPage';
+import EditList from './components/EditList';
 
 
 const Stack = createNativeStackNavigator();
@@ -18,6 +19,7 @@ export default function Routes() {
             <Stack.Screen name="main" component={MainPage} options={{ headerShown: false }} />
             <Stack.Screen name="not-found-page" component={NotFoundPage} options={{ headerShown: false }} />
             <Stack.Screen name="create-list" component={CreateList} options={{ headerShown: false }} />
+            <Stack.Screen name="edit-list" component={EditList} options={{ headerShown: false }} />
         </Stack.Navigator>
     )
 }

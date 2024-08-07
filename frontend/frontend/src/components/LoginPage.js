@@ -36,7 +36,7 @@ export default function LoginPage() {
   }
 
   useEffect(() => {}, [token]);
-
+  console.log(token);
   const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
       setErrorMessage('');
@@ -69,6 +69,7 @@ export default function LoginPage() {
             initialValues={{ username: '', password: '' }}
             validationSchema={validationSchema}
             onSubmit={handleFormSubmit}
+            KeyboardAwareScrollView={false}
           >
             {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
               <View style={styles.form}>

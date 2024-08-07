@@ -1,18 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
 
 const NewListCard = ({ isPremium, onPress }) => {
   const titleColor = !isPremium ? 'black' : '#478BFF';
   const borderColor = !isPremium ? 'black' : `${titleColor}`;
   const backgroundColor = !isPremium ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
   const titleFontColor = !isPremium ? `#41413E` : `white`;
-  const navigation = useNavigation();
-
-  const navigateTo = (route) => {
-    navigation.navigate(route);
-  };
 
   return (
     <View

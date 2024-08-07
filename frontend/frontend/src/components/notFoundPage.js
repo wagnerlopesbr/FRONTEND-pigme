@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const NotFoundPage = () => {
   const navigation = useNavigation();
-  const navigateTo = (route) => navigation.navigate(route);
+  const navigateTo = (route, params = {}) => { navigation.navigate(route, params) };
   return (
     <View style={styles.container}>
       <Image
