@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import { useAtom } from 'jotai/react';
+import { userAtom } from '../utils/jotai';
 
 export default function ProfilePage() {
+  const [user] = useAtom(userAtom);
   const navigation = useNavigation();
   const navigateTo = (route) => navigation.navigate(route);
   const [profile, setProfile] = useState({
-    firstName: '',
-    lastName: '',
-    zipCode: '',
-    isPremium: false,
-    email: '',
-    password: '',
+    firstName: user.first_name || '',
+    lastName: user.last_name || '',
+    zipCode: user.zip_code || '',
+    isPremium: user.is_premium,
+    email: user.email || '',
+    password: user.password || '',
   });
 
   const handleInputChange = (field, value) => {
@@ -21,20 +23,20 @@ export default function ProfilePage() {
   };
 
   const handleSave = () => {
-  Alert.alert(
-    'Perfil salvo',
-    'As informações do perfil foram atualizadas.',
-    [
+    Alert.alert(
+      'Perfil salvo',
+      'As informações do perfil foram atualizadas.',
+      [
+        {
+          text: 'OK',
+          onPress: () => navigateTo('UserLists'),
+        },
+      ],
       {
-        text: 'OK',
-        onPress: () => navigateTo('UserLists'),
-      },
-    ],
-    {
-      cancelable: false,
-    }
-  );
-};
+        cancelable: false,
+      }
+    );
+  };
 
   return (
     <View style={styles.container}>

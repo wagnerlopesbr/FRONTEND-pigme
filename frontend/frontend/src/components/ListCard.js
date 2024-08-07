@@ -2,17 +2,17 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const ListCard = ({ item, isPremium, onEdit, onBuy }) => {
-  const titleColor = isPremium ? 'black' : '#FFB047';
-  const borderColor = isPremium ? 'black' : `${titleColor}`;
-  const backgroundColor = isPremium ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
-  const titleFontColor = isPremium ? `#41413E` : `white`;
+const ListCard = ({ index, item, isPremium, onEdit, onBuy }) => {
+  const titleColor = (!isPremium && index > 2) ? 'black' : '#FFB047';
+  const borderColor = (!isPremium && index > 2) ? 'black': `${titleColor}`;
+  const backgroundColor = (!isPremium && index > 2) ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
+  const titleFontColor = (!isPremium && index > 2) ? `#41413E` : `white`;
 
   return (
     <View
       style={[
         styles.itemContainer,
-        isPremium && styles.premiumItemContainer,
+        (!isPremium && index > 2) && styles.notPremiumItemContainer,
         { borderColor: borderColor }
       ]}
     >
@@ -23,18 +23,18 @@ const ListCard = ({ item, isPremium, onEdit, onBuy }) => {
         ]}
       >
         <Text style={[styles.itemTitle, {color: titleFontColor}]}>
-          {isPremium ? `Lista Premium ${item}` : `Lista ${item}`}
+          {!isPremium ? `Lista Premium ${item.title}` : `Lista ${item.title}`}
         </Text>
       </View>
       <View style={[styles.buttonsContainer, { backgroundColor: backgroundColor }]}>
-        <TouchableOpacity disabled={isPremium} style={styles.button} onPress={() => onEdit(item)}>
+        <TouchableOpacity disabled={!isPremium} style={styles.button} onPress={() => onEdit(item)}>
           <Icon name="file-document-edit-outline" size={55} color={isPremium ? "#41413E" : "#4E4E11"} />
         </TouchableOpacity>
-        <TouchableOpacity disabled={isPremium} style={styles.button} onPress={() => onBuy(item)}>
+        <TouchableOpacity disabled={!isPremium} style={styles.button} onPress={() => onBuy(item)}>
           <Icon name="cart-variant" size={55} color={isPremium ? "#41413E" : "#4E4E11"} />
         </TouchableOpacity>
       </View>
-      {isPremium && (
+      {(!isPremium && index > 3) && (
         <View style={styles.iconContainer}>
           <Icon name="lock" size={60} color="yellow" />
         </View>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
   },
-  premiumItemContainer: {
+  notPremiumItemContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     backdropFilter: 'blur(10px)',
   },

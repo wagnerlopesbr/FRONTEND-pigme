@@ -17,6 +17,7 @@ export default function Routes() {
             <Stack.Screen name="remember-account" component={RememberAccountPage} options={{ headerShown: false }} />
             <Stack.Screen name="main" component={MainPage} options={{ headerShown: false }} />
             <Stack.Screen name="not-found-page" component={NotFoundPage} options={{ headerShown: false }} />
+            <Stack.Screen name="create-list" component={CreateList} options={{ headerShown: false }} />
         </Stack.Navigator>
     )
 }

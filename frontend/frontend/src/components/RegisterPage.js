@@ -38,10 +38,8 @@ export default function RegisterPage() {
   const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await registerUser(values);
-      console.log('Handle Success:', response);
       navigateTo('login');
     } catch (error) {
-      console.log(values);
       console.error('Handle Error:', error);
     } finally {
       setSubmitting(false);
