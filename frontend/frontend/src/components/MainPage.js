@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Appbar } from 'react-native-paper';
-import ListCard from './ListCard';
-import NewListCard from './NewListCard';
 import ProfilePage from './ProfilePage';
 import NotFoundPage from './notFoundPage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Slide from './Slide';
-import * as Animatable from 'react-native-animatable';
+import ListsPage from './ListsPage';
+import { userAtom } from '../utils/jotai';
+import { useAtom } from 'jotai/react';
 
 
 const Tab = createBottomTabNavigator();
@@ -29,67 +28,10 @@ function Header({ username, onLogout }) {
   );
 }
 
-function UserListsScreen() {
-  // const items = Array.from({ length: 10 }, (_, index) => index + 1);
-  const [listCards, setListCards] = useState([1, 2, 3]);
-
-  const navigate = useNavigation();
-  const navigateTo = (route) => {navigate.navigate(route)};
-
-  const handleEdit = (item) => {
-    console.log(`Editar Lista ${item}`);
-  };
-
-  const handleBuy = (item) => {
-    console.log(`Comprar Lista ${item}`);
-  };
-
-  // const addListCard = () => {
-  //   if (listCards.length < 10) {
-  //     setListCards([...listCards, listCards.length + 1]);
-  //   }
-  // };
-
-  const test_isPremium = false;
-
-  return (
-    <View style={styles.userListsContainer}>
-      <ScrollView contentContainerStyle={styles.listContainer} style={styles.scrollView}>
-        {listCards.slice(0, 10).map((item, index) => (
-          <ListCard
-            key={item}
-            item={item}
-            isPremium={index >= 3}
-            onEdit={handleEdit}
-            onBuy={handleBuy}
-          />
-        ))}
-        {listCards.length < 10 && (
-          <NewListCard isPremium={listCards.length <= 2 ? false : true} />
-        )}
-      </ScrollView>
-      {!test_isPremium &&
-        <Animatable.Text
-          animation="pulse"
-          duration={1000}
-          style={styles.button}
-          iterationCount="infinite"
-          direction="alternate"
-          onPress={() => navigateTo('not-found-page')}
-        >
-          <Text style={styles.buttonText}>Comprar Premium</Text>
-        </Animatable.Text>
-        // <TouchableOpacity style={styles.button} onPress={() => navigateTo('not-found-page')}>
-        //  <Text style={styles.buttonText}>Comprar Premium</Text>
-        // </TouchableOpacity>
-      }
-      {!test_isPremium && <Slide />}
-    </View>
-  );
-}
-
 export default function MainPage() {
+  const [refreshFlag, setRefreshFlag] = useState(false);
   const navigate = useNavigation();
+  const [user] = useAtom(userAtom);
 
   const navigateTo = (route) => {
     navigate.navigate(route);
@@ -100,9 +42,13 @@ export default function MainPage() {
     navigateTo('login');
   };
 
+  const refreshLists = () => {
+    setRefreshFlag(prev => !prev);
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      <Header username={'Nome do Usuário'} onLogout={handleLogout} />
+      <Header username={user.first_name || "Bem-Vindo(a)!"} onLogout={handleLogout} />
       <Tab.Navigator
         initialRouteName='UserLists'
         screenOptions={{
@@ -123,7 +69,7 @@ export default function MainPage() {
         />
         <Tab.Screen 
           name="UserLists" 
-          component={UserListsScreen} 
+          children={() => <ListsPage refreshLists={refreshLists} />}
           options={{ 
             title: 'Listas',
             tabBarIcon: ({ size }) => (

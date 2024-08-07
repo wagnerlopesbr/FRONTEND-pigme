@@ -3,12 +3,11 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 
-
-const NewListCard = ({ isPremium }) => {
-  const titleColor = isPremium ? 'black' : '#478BFF';
-  const borderColor = isPremium ? 'black' : `${titleColor}`;
-  const backgroundColor = isPremium ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
-  const titleFontColor = isPremium ? `#41413E` : `white`;
+const NewListCard = ({ isPremium, onPress }) => {
+  const titleColor = !isPremium ? 'black' : '#478BFF';
+  const borderColor = !isPremium ? 'black' : `${titleColor}`;
+  const backgroundColor = !isPremium ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
+  const titleFontColor = !isPremium ? `#41413E` : `white`;
   const navigation = useNavigation();
 
   const navigateTo = (route) => {
@@ -19,7 +18,7 @@ const NewListCard = ({ isPremium }) => {
     <View
       style={[
         styles.itemContainer,
-        isPremium && styles.premiumItemContainer,
+        !isPremium && styles.premiumItemContainer,
         { borderColor: borderColor }
       ]}
     >
@@ -30,15 +29,15 @@ const NewListCard = ({ isPremium }) => {
         ]}
       >
         <Text style={[styles.itemTitle, {color: titleFontColor}]}>
-          {isPremium ? `Nova Lista Premium` : `Nova Lista`}
+          {!isPremium ? `Nova Lista Premium` : `Nova Lista`}
         </Text>
       </View>
       <View style={[styles.buttonsContainer, { backgroundColor: backgroundColor }]}>
-        <TouchableOpacity disabled={isPremium} style={styles.button} onPress={() => navigateTo('not-found-page')}>
+        <TouchableOpacity disabled={!isPremium} style={styles.button} onPress={onPress}>
           <Icon name="file-plus-outline" size={55} color="#4E4E11" />
         </TouchableOpacity>
       </View>
-      {isPremium && (
+      {!isPremium && (
         <View style={styles.iconContainer}>
           <Icon name="lock" size={60} color="yellow" />
         </View>
@@ -48,18 +47,6 @@ const NewListCard = ({ isPremium }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#e8ecf4',
-    paddingHorizontal: 10,
-    paddingVertical: 15,
-  },
-  listContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
   itemContainer: {
     width: '48%',
     height: 130,
@@ -74,7 +61,6 @@ const styles = StyleSheet.create({
   },
   premiumItemContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    backdropFilter: 'blur(10px)',
   },
   itemTitleContainer: {
     width: '105%',

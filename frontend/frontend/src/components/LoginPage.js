@@ -12,7 +12,9 @@ import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { loginUser } from '../utils/crud_actions';
+import { loginUser, getUser } from '../utils/crud_actions';
+import { tokenAtom, userAtom } from '../utils/jotai';
+import { useAtom } from 'jotai/react';
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()
@@ -24,6 +26,8 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function LoginPage() {
+  const [token, setToken] = useAtom(tokenAtom);
+  const [user, setUser] = useAtom(userAtom);
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
 
@@ -31,11 +35,15 @@ export default function LoginPage() {
     navigation.navigate(route);
   }
 
+  useEffect(() => {}, [token]);
+
   const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
       setErrorMessage('');
-      // const response = await loginUser(values);
-      // console.log('Handle Success:', response);
+      const response = await loginUser(values);
+      const userData = await getUser(response.token);
+      setUser(userData);
+      setToken(response.token);
       navigateTo('main');
     } catch (error) {
       setErrorMessage('Credenciais incorretas ou conta inexistente.');
@@ -44,10 +52,6 @@ export default function LoginPage() {
       setSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    
-  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#e8ecf4' }}>
@@ -63,7 +67,7 @@ export default function LoginPage() {
 
           <Formik
             initialValues={{ username: '', password: '' }}
-            // validationSchema={validationSchema}
+            validationSchema={validationSchema}
             onSubmit={handleFormSubmit}
           >
             {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
