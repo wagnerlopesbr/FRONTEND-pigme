@@ -1,30 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, FlatList, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { getLists, updateList, getPkList } from '../utils/crud_actions';
-import { getProductsWithNames } from '../utils/api_products_actions';
-import { tokenAtom, userAtom, productsAtom } from '../utils/jotai';
+import ProductsSelection from './ProductsSelection';
+import { tokenAtom, userAtom } from '../utils/jotai';
 import { useAtom } from 'jotai/react';
-import { Picker } from '@react-native-picker/picker';
+import InputSpinner from 'react-native-input-spinner';
 
 const EditList = ({ route }) => {
-  const [token, setToken] = useAtom(tokenAtom);
-  const [user, setUser] = useAtom(userAtom);
+  const [token] = useAtom(tokenAtom);
+  const [user] = useAtom(userAtom);
   const navigation = useNavigation();
   const { listId } = route.params;
 
-  const [listData, setListData] = useState({
+  const [list, setList] = useState({
     title: '',
     products: [],
   });
   const [loading, setLoading] = useState(true);
-  const [productsApiData, setProductsApiData] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  
   const fetchList = async () => {
     try {
       const response = await getPkList(listId, token);
-      setListData({
+      setList({
         title: response.title || '',
         products: response.products || [],
       });
@@ -34,27 +33,26 @@ const EditList = ({ route }) => {
     }
   };
 
-  const fetchProducts = async () => {
-    try {
-      const response = await getProductsWithNames();
-      setProductsApiData(response.products);
-    } catch (error) {
-      console.error('Erro ao buscar produtos:', error.message || error);
-    }
-  };
-
   useEffect(() => {
     fetchList();
-    fetchProducts();
   }, [listId]);
 
   const handleInputChange = (field, value) => {
-    setListData({ ...listData, [field]: value });
+    setList({ ...list, [field]: value });
   };
 
   const handleSave = async () => {
     try {
-      await updateList(listId, listData, token);
+      const transformedProducts = list.products.map(product => ({
+        title: product.name || product.title,
+        price: product.price,
+        brand: product.brand,
+        quantity: product.quantity || 1,
+      }));
+
+      const updatedList = { ...list, products: transformedProducts };
+
+      await updateList(listId, updatedList, token);
       Alert.alert('Sucesso', 'Lista atualizada com sucesso!', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
@@ -63,84 +61,91 @@ const EditList = ({ route }) => {
     }
   };
 
-  const handleAddProduct = () => {
-    if (selectedProduct) {
-      const product = productsApiData.find(p => p.id === selectedProduct);
-      if (product) {
-        setListData(prevList => ({
-          ...prevList,
-          products: [
-            ...prevList.products,
-            {
-              title: product.name,
-              price: product.price,
-              brand: product.brand,
-              category: product.category,
-            },
-          ],
-        }));
-      }
-      setSelectedProduct(null); // Clear selection
-    }
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
   };
+
+  const handleAddProducts = (products) => {
+    const transformedProducts = products.map(product => ({
+      brand: product.brand,
+      price: product.price,
+      title: product.name,
+      quantity: product.quantity || 1
+    }));
+    setList(prevState => ({
+      ...prevState,
+      products: [...prevState.products, ...transformedProducts]
+    }));
+    toggleModal();
+  };
+
+  const handleQuantityChange = (id, quantity) => {
+    setList(prevState => ({
+      ...prevState,
+      products: prevState.products.map(product =>
+        product.id === id ? { ...product, quantity } : product
+      )
+    }));
+  };
+
+  const handleRemoveProduct = (id) => {
+    setList(prevState => ({
+      ...prevState,
+      products: prevState.products.filter(product => product.id !== id)
+    }));
+  };
+
+  const renderProduct = ({ item }) => (
+    <View style={styles.productContainer}>
+      <View style={styles.productInfo}>
+        <InputSpinner
+          min={1}
+          step={1}
+          value={item.quantity}
+          onChange={(qtt) => handleQuantityChange(item.id, qtt)}
+          style={styles.quantityInput}
+          buttonStyle={styles.spinnerButton}
+          textColor='#000'
+          inputStyle={styles.inputStyle}
+        />
+        <Text style={styles.productText}>
+          {item.title || item.name} - {item.brand}
+        </Text>
+      </View>
+      <TouchableOpacity onPress={() => handleRemoveProduct(item.id)}>
+        <Text style={styles.removeText}>Remover</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   if (loading) {
     return <Text>Carregando...</Text>;
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.label}>Título:</Text>
       <TextInput
         style={styles.input}
-        value={listData.title}
+        value={list.title}
         onChangeText={(text) => handleInputChange('title', text)}
       />
       <Text style={styles.label}>Produtos:</Text>
-      
-      {/* Dropdown to select product */}
-      <View style={styles.dropdownContainer}>
-        <Text style={styles.label}>Adicionar Produto:</Text>
-        <Picker
-          selectedValue={selectedProduct}
-          onValueChange={(itemValue) => setSelectedProduct(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Selecione um produto" value={null} />
-          {productsApiData.map(product => (
-            <Picker.Item key={product.id} label={product.name} value={product.id} />
-          ))}
-        </Picker>
-        <Button title="Adicionar" onPress={handleAddProduct} />
-      </View>
-
-      {listData.products.map((product, index) => (
-        <View key={index} style={styles.productContainer}>
-          <TextInput
-            style={styles.productInput}
-            value={product.title}
-            onChangeText={(text) => {
-              const updatedProducts = [...listData.products];
-              updatedProducts[index].title = text;
-              setListData({ ...listData, products: updatedProducts });
-            }}
-            placeholder="Título do Produto"
-          />
-          <TextInput
-            style={styles.productInput}
-            value={String(product.price)}
-            onChangeText={(text) => {
-              const updatedProducts = [...listData.products];
-              updatedProducts[index].price = Number(text);
-              setListData({ ...list, products: updatedProducts });
-            }}
-            placeholder="Preço do Produto"
-            keyboardType="numeric"
-          />
-        </View>
-      ))}
+      <FlatList
+        data={list.products}
+        keyExtractor={item => item.id}
+        renderItem={renderProduct}
+        ListEmptyComponent={<Text>Não há produtos na lista.</Text>}
+      />
+      <Button title="Adicionar Produtos" onPress={toggleModal} />
       <Button title="Salvar" onPress={handleSave} />
-    </ScrollView>
+
+      <ProductsSelection
+        isVisible={isModalVisible}
+        onClose={toggleModal}
+        onAddProducts={handleAddProducts}
+      />
+    </View>
   );
 };
 
@@ -163,22 +168,38 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   productContainer: {
-    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
+    justifyContent: 'space-between',
   },
-  productInput: {
+  productInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  productText: {
+    fontSize: 16,
+    marginRight: 8,
+    flex: 1,
+  },
+  quantityInput: {
+    width: 120,
     height: 40,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    marginBottom: 8,
+    marginRight: 8,
   },
-  dropdownContainer: {
-    marginBottom: 16,
+  spinnerButton: {
+    backgroundColor: '#ddd',
   },
-  picker: {
-    height: 50,
-    width: '100%',
+  inputStyle: {
+    fontSize: 16,
+    textAlign: 'center',
+    padding: 0,
+  },
+  removeText: {
+    color: 'red',
   },
 });
 

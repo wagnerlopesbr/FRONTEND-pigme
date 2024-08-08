@@ -116,8 +116,10 @@ const updateList = async (listId, listData, token) => {
         'Content-Type': 'application/json',
       },
     });
+    console.log('response.data:', response.data);
     return response.data;
   } catch (error) {
+    console.log('data:', { listId, listData, token });
     console.error('Erro ao atualizar lista:', error.message || error);
     throw error;
   }
