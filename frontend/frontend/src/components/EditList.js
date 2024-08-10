@@ -48,9 +48,11 @@ const EditList = ({ route }) => {
         price: product.price,
         brand: product.brand,
         quantity: product.quantity || 1,
+        id: product.id,
       }));
 
-      const updatedList = { ...list, products: transformedProducts };
+      const updatedList = { ...list, transformedProducts };
+      console.log('updatedList:', updatedList);
 
       await updateList(listId, updatedList, token);
       Alert.alert('Sucesso', 'Lista atualizada com sucesso!', [
@@ -69,13 +71,16 @@ const EditList = ({ route }) => {
     const transformedProducts = products.map(product => ({
       brand: product.brand,
       price: product.price,
-      title: product.name,
-      quantity: product.quantity || 1
+      title: product.name || product.title,
+      quantity: product.quantity || 1,
+      id: product.id,
     }));
+    console.log('transformedProducts:', transformedProducts);
     setList(prevState => ({
       ...prevState,
       products: [...prevState.products, ...transformedProducts]
     }));
+    console.log('list agora', list);
     toggleModal();
   };
 

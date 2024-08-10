@@ -109,17 +109,14 @@ const updateList = async (listId, listData, token) => {
     if (!BACKEND_CRUD_URL) {
       throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
     }
-
     const response = await axios.put(`${BACKEND_CRUD_URL}lists/${listId}/`, listData, {
       headers: {
         Authorization: `Token ${token}`,
         'Content-Type': 'application/json',
       },
     });
-    console.log('response.data:', response.data);
     return response.data;
   } catch (error) {
-    console.log('data:', { listId, listData, token });
     console.error('Erro ao atualizar lista:', error.message || error);
     throw error;
   }
