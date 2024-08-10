@@ -43,7 +43,6 @@ function ListsPage({ refreshLists }) {
   const navigateTo = (route, params = {}) => { navigate.navigate(route, params) };
 
   const handleEdit = (item) => {
-    console.log('Editar Lista:', item);
     navigateTo('edit-list', { listId: item.id });
   };
 
@@ -53,7 +52,6 @@ function ListsPage({ refreshLists }) {
 
   const handleCreateList = (listName) => {
     setIsCreateListVisible(false);
-    console.log('Lista criada:', listName);
   };
 
 

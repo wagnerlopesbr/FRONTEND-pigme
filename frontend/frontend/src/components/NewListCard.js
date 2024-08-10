@@ -43,7 +43,7 @@ const NewListCard = ({ isPremium, onPress }) => {
 const styles = StyleSheet.create({
   itemContainer: {
     width: '48%',
-    height: 130,
+    height: 125,
     marginBottom: 15,
     borderRadius: 5,
     borderWidth: 5,

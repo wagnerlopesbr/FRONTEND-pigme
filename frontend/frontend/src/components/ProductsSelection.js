@@ -29,7 +29,7 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  console.log('selectedProducts:', selectedProducts);
   const toggleProductSelection = (product) => {
     setSelectedProducts(prevSelectedProducts => {
       if (prevSelectedProducts.some(p => p.id === product.id)) {
