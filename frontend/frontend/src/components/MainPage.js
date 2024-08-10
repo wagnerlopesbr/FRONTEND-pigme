@@ -7,8 +7,9 @@ import NotFoundPage from './notFoundPage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ListsPage from './ListsPage';
-import { userAtom } from '../utils/jotai';
+import { userAtom, tokenAtom } from '../utils/jotai';
 import { useAtom } from 'jotai/react';
+import { logoutUser } from '../utils/crud_actions';
 
 
 const Tab = createBottomTabNavigator();
@@ -29,19 +30,15 @@ function Header({ username, onLogout }) {
 }
 
 export default function MainPage() {
-  const [refreshFlag, setRefreshFlag] = useState(false);
   const navigate = useNavigation();
   const [user] = useAtom(userAtom);
+  const [token] = useAtom(tokenAtom);
 
   const navigateTo = (route, params = {}) => { navigate.navigate(route, params) };
 
-  const handleLogout = () => {
-    console.log('Logout');
+  const handleLogout = async () => {
+    await logoutUser(token);
     navigateTo('login');
-  };
-
-  const refreshLists = () => {
-    setRefreshFlag(prev => !prev);
   };
 
   return (
@@ -67,7 +64,7 @@ export default function MainPage() {
         />
         <Tab.Screen 
           name="UserLists" 
-          children={() => <ListsPage refreshLists={refreshLists} />}
+          component={ListsPage}
           options={{ 
             title: 'Listas',
             tabBarIcon: ({ size }) => (
@@ -92,7 +89,7 @@ export default function MainPage() {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#FF005E',
+    backgroundColor: 'red',
     width: '93%',
     alignSelf: 'center',
     justifyContent: 'center',

@@ -29,7 +29,6 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  console.log('selectedProducts:', selectedProducts);
   const toggleProductSelection = (product) => {
     setSelectedProducts(prevSelectedProducts => {
       if (prevSelectedProducts.some(p => p.id === product.id)) {
@@ -66,27 +65,34 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
             onChangeText={setSearchQuery}
           />
           <FlatList
+            style={{ borderTopWidth: 1, borderTopColor: '#ddd', width: '100%' }}
             data={filteredProducts}
             keyExtractor={item => item.id}
             renderItem={({ item }) => (
-              <View style={styles.productContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.productContainer,
+                  {
+                    backgroundColor: selectedProducts.some(p => p.id === item.id) ? '#E0E0E0' : 'white',
+                  },
+                ]}
+                onPress={() => toggleProductSelection(item)}
+              >
                 <Text style={styles.productText}>{item.name} - {item.brand}</Text>
                 <CheckBox
                   checked={selectedProducts.some(p => p.id === item.id)}
-                  onPress={() => {
-                    toggleProductSelection(item);
-                  }}
+                  onPress={() => toggleProductSelection(item)}
                   containerStyle={styles.checkboxContainer}
                 />
-              </View>
+              </TouchableOpacity>
             )}
           />
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.button} onPress={handleAddProducts}>
-              <Text style={styles.buttonText}>Adicionar</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleAddProducts}>
+              <Text style={styles.buttonText}>Adicionar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -128,6 +134,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     paddingVertical: 10,
+    paddingHorizontal: 5,
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
   },
@@ -136,7 +143,7 @@ const styles = StyleSheet.create({
     width: width * 0.7,
   },
   checkboxContainer: {
-    margin: 0,
+    marginVertical: 0,
     padding: 0,
     backgroundColor: 'transparent',
   },
@@ -147,7 +154,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: '#FF005E',
+    backgroundColor: 'red',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

@@ -4,3 +4,18 @@ placeholder color: #848484
 input control color: #E0E0E0
 button color: #FFCA36
 button text color: #707018
+
+
+{
+  "first_name": null,
+  "id": 2,
+  "is_active": true,
+  "is_premium": true,
+  "last_name": null,
+  "user": {
+    "email": "usuario2@mail.com",
+    "id": 2,
+    "username": "usuario2"
+  },
+  "zip_code": null
+}

@@ -49,6 +49,47 @@ const getUser = async (token) => {
   }
 };
 
+const updateUser = async (userData, token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+
+    const response = await axios.put(`${BACKEND_CRUD_URL}accounts/`, userData, {
+      headers: {
+        Authorization: `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizar usuário:', error.message || error);
+    throw error;
+  }
+};
+
+const updatePassword = async (data, token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+    const response = await axios.put(
+      `${BACKEND_CRUD_URL}accounts/password_change/`,
+      data,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao atualizaaaar senha:', error.message || error);
+    throw error;
+  }
+};
+
 const getLists = async (token) => {
   try {
     if (!BACKEND_CRUD_URL) {
@@ -122,4 +163,38 @@ const updateList = async (listId, listData, token) => {
   }
 };
 
-export { registerUser, loginUser, createList, getLists, getUser, updateList, getPkList };
+const logoutUser = async (token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+
+    await axios.post(`${BACKEND_CRUD_URL}logout/`, null, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Erro ao deslogar usuário:', error.message || error);
+    throw error;
+  }
+};
+
+const logoutUserFromAll = async (token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+
+    await axios.post(`${BACKEND_CRUD_URL}logoutall/`, null, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Erro ao deslogar usuário:', error.message || error);
+    throw error;
+  }
+};
+
+export { updatePassword, updateUser, registerUser, loginUser, createList, getLists, getUser, updateList, getPkList, logoutUser, logoutUserFromAll };

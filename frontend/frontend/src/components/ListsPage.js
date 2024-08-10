@@ -11,7 +11,7 @@ import { tokenAtom, userAtom } from '../utils/jotai';
 import { useAtom } from 'jotai/react';
 
 
-function ListsPage({ refreshLists }) {
+function ListsPage() {
   const [isCreateListVisible, setIsCreateListVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [lists, setLists] = useState([]);
@@ -47,7 +47,7 @@ function ListsPage({ refreshLists }) {
   };
 
   const handleBuy = (item) => {
-    console.log('Comprar Lista:', item);
+    navigateTo('check-list', { listId: item.id });
   };
 
   const handleCreateList = (listName) => {
@@ -108,7 +108,7 @@ export default ListsPage;
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#FF005E',
+    backgroundColor: 'red',
     width: '93%',
     alignSelf: 'center',
     justifyContent: 'center',
@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
   userListsContainer: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: '#FFF9F9',
   },
   listContainer: {
     paddingHorizontal: 15,

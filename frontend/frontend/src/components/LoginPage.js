@@ -35,7 +35,6 @@ export default function LoginPage() {
     navigation.navigate(route);
   }
 
-  console.log(token);
   useEffect(() => {}, [token]);
   const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
