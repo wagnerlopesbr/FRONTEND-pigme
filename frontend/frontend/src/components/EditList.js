@@ -6,6 +6,8 @@ import ProductsSelection from './ProductsSelection';
 import { tokenAtom, userAtom } from '../utils/jotai';
 import { useAtom } from 'jotai/react';
 import InputSpinner from 'react-native-input-spinner';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 const EditList = ({ route }) => {
   const [token] = useAtom(tokenAtom);
@@ -42,26 +44,35 @@ const EditList = ({ route }) => {
   };
 
   const handleSave = async () => {
-    try {
-      const transformedProducts = list.products.map(product => ({
-        title: product.name || product.title,
-        price: product.price,
-        brand: product.brand,
-        quantity: product.quantity || 1,
-        id: product.id,
-      }));
+  if (list.products.length > 40) {
+    Alert.alert(
+      'Limite Excedido',
+      'Você não pode adicionar mais de 40 produtos à lista.',
+      [{ text: 'OK' }]
+    );
+    return;
+  }
 
-      const updatedList = { ...list, transformedProducts };
-      console.log('updatedList:', updatedList);
+  try {
+    const transformedProducts = list.products.map(product => ({
+      title: product.name || product.title,
+      price: product.price,
+      brand: product.brand,
+      quantity: product.quantity || 1,
+      id: product.id,
+    }));
 
-      await updateList(listId, updatedList, token);
-      Alert.alert('Sucesso', 'Lista atualizada com sucesso!', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível atualizar a lista.');
-    }
-  };
+    const updatedList = { ...list, transformedProducts };
+
+    await updateList(listId, updatedList, token);
+    Alert.alert('Sucesso', 'Lista atualizada com sucesso!', [
+      { text: 'OK', onPress: () => navigation.goBack() },
+    ]);
+  } catch (error) {
+    Alert.alert('Erro', 'Não foi possível atualizar a lista.');
+  }
+};
+
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -75,12 +86,10 @@ const EditList = ({ route }) => {
       quantity: product.quantity || 1,
       id: product.id,
     }));
-    console.log('transformedProducts:', transformedProducts);
     setList(prevState => ({
       ...prevState,
       products: [...prevState.products, ...transformedProducts]
     }));
-    console.log('list agora', list);
     toggleModal();
   };
 
@@ -100,28 +109,38 @@ const EditList = ({ route }) => {
     }));
   };
 
-  const renderProduct = ({ item }) => (
-    <View style={styles.productContainer}>
-      <View style={styles.productInfo}>
-        <InputSpinner
-          min={1}
-          step={1}
-          value={item.quantity}
-          onChange={(qtt) => handleQuantityChange(item.id, qtt)}
-          style={styles.quantityInput}
-          buttonStyle={styles.spinnerButton}
-          textColor='#000'
-          inputStyle={styles.inputStyle}
-        />
-        <Text style={styles.productText}>
-          {item.title || item.name} - {item.brand}
-        </Text>
+  const renderProduct = ({ item, index }) => {
+    const backgroundColor = index % 2 === 0 ? '#FFF0F0' : '#FFF6F6';
+    return (
+      <View style={[styles.productContainer, { backgroundColor }]}>
+        <View style={styles.productInfo}>
+          <InputSpinner
+            height={25}
+            buttonFontSize={10}
+            buttonTextColor='black'
+            background={backgroundColor}
+            arrows={true}
+            min={1}
+            step={1}
+            value={item.quantity}
+            onChange={(qtt) => handleQuantityChange(item.id, qtt)}
+            style={styles.quantityInput}
+            buttonStyle={{ backgroundColor, width: 50 }}
+            textColor='#000'
+            inputStyle={styles.inputStyle}
+            rounded={false}
+            containerProps={{ marginRight: -10, marginLeft: -10, paddingHorizontal: 50 }}
+          />
+          <Text style={styles.productText}>
+            {item.title || item.name} - {item.brand}
+          </Text>
+        </View>
+        <TouchableOpacity onPress={() => handleRemoveProduct(item.id)}>
+          <Icon name="pail-remove-outline" size={25} color='black' marginRight={10} />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={() => handleRemoveProduct(item.id)}>
-        <Text style={styles.removeText}>Remover</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   if (loading) {
     return <Text>Carregando...</Text>;
@@ -135,15 +154,24 @@ const EditList = ({ route }) => {
         value={list.title}
         onChangeText={(text) => handleInputChange('title', text)}
       />
-      <Text style={styles.label}>Produtos:</Text>
+      <View style={styles.headerContainer}>
+        <Text style={[ styles.label, { paddingTop: 0, paddingBottom: 3 }]}>
+          Produtos: <Text style={{ fontSize: 14, color: '#444', fontStyle: 'italic' }}>({list.products.length} no total)</Text>
+        </Text>
+        <TouchableOpacity onPress={toggleModal}>
+          <Icon name="cart-plus" size={25} color='black' marginRight={10} />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={list.products}
         keyExtractor={item => item.id}
         renderItem={renderProduct}
         ListEmptyComponent={<Text>Não há produtos na lista.</Text>}
       />
-      <Button title="Adicionar Produtos" onPress={toggleModal} />
-      <Button title="Salvar" onPress={handleSave} />
+      
+      <View style={{ paddingBottom: 20 }}>
+        <Button title="Salvar" onPress={handleSave} />
+      </View>
 
       <ProductsSelection
         isVisible={isModalVisible}
@@ -155,14 +183,23 @@ const EditList = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: '#FFF9F9',
   },
   label: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    paddingTop: 30,
   },
   input: {
     height: 40,
@@ -171,11 +208,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 8,
     marginBottom: 16,
+    backgroundColor: '#fff',
   },
   productContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: -5,
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
     justifyContent: 'space-between',
@@ -195,9 +233,6 @@ const styles = StyleSheet.create({
     height: 40,
     marginRight: 8,
   },
-  spinnerButton: {
-    backgroundColor: '#ddd',
-  },
   inputStyle: {
     fontSize: 16,
     textAlign: 'center',
@@ -206,6 +241,17 @@ const styles = StyleSheet.create({
   removeText: {
     color: 'red',
   },
+  Button: {
+    marginTop: 10,
+    backgroundColor: 'red',
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  }
 });
 
 export default EditList;
