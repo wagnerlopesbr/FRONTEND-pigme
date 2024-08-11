@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   function navigateTo(route) {
     navigation.navigate(route);
-  }
+  };
 
   useEffect(() => {}, [token]);
   const handleFormSubmit = async (values, { setSubmitting }) => {
