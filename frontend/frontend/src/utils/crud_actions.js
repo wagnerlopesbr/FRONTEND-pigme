@@ -163,6 +163,22 @@ const updateList = async (listId, listData, token) => {
   }
 };
 
+const deleteList = async (listId, token) => {
+  try {
+    if (!BACKEND_CRUD_URL) {
+      throw new Error('BACKEND_CRUD_URL não está definida nas constantes de configuração.');
+    }
+    await axios.delete(`${BACKEND_CRUD_URL}lists/${listId}/`, {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    })
+  } catch (error) {
+    console.error('Erro ao deletar lista:', error.message || error);
+    throw error;
+  }
+};
+
 const logoutUser = async (token) => {
   try {
     if (!BACKEND_CRUD_URL) {
@@ -197,4 +213,4 @@ const logoutUserFromAll = async (token) => {
   }
 };
 
-export { updatePassword, updateUser, registerUser, loginUser, createList, getLists, getUser, updateList, getPkList, logoutUser, logoutUserFromAll };
+export { deleteList, updatePassword, updateUser, registerUser, loginUser, createList, getLists, getUser, updateList, getPkList, logoutUser, logoutUserFromAll };

@@ -2,17 +2,17 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const NewListCard = ({ isPremium, onPress }) => {
-  const titleColor = !isPremium ? 'black' : '#478BFF';
-  const borderColor = !isPremium ? 'black' : `${titleColor}`;
-  const backgroundColor = !isPremium ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
-  const titleFontColor = !isPremium ? `#41413E` : `white`;
+const NewListCard = ({ index, isPremium, onPress }) => {
+  const titleColor = (!isPremium && index > 2) ? 'black' : '#478BFF';
+  const borderColor = (!isPremium && index > 2) ? 'black' : `${titleColor}`;
+  const backgroundColor = (!isPremium && index > 2) ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
+  const titleFontColor = (!isPremium && index > 2) ? `#41413E` : `white`;
 
   return (
     <View
       style={[
         styles.itemContainer,
-        !isPremium && styles.premiumItemContainer,
+        (!isPremium && index > 2) && styles.premiumItemContainer,
         { borderColor: borderColor }
       ]}
     >
@@ -23,15 +23,15 @@ const NewListCard = ({ isPremium, onPress }) => {
         ]}
       >
         <Text style={[styles.itemTitle, {color: titleFontColor}]}>
-          {!isPremium ? `Nova Lista Premium` : `Nova Lista`}
+          {(!isPremium && index > 2) ? `Nova Lista Premium` : `Nova Lista`}
         </Text>
       </View>
       <View style={[styles.buttonsContainer, { backgroundColor: backgroundColor }]}>
-        <TouchableOpacity disabled={!isPremium} style={styles.button} onPress={onPress}>
+        <TouchableOpacity disabled={(!isPremium && index > 2)} style={styles.button} onPress={onPress}>
           <Icon name="file-plus-outline" size={55} color="#4E4E11" />
         </TouchableOpacity>
       </View>
-      {!isPremium && (
+      {(!isPremium && index > 2) && (
         <View style={styles.iconContainer}>
           <Icon name="lock" size={60} color="yellow" />
         </View>

@@ -76,6 +76,7 @@ function ListsPage() {
         ))}
         {lists.length < 10 && (
           <NewListCard
+            index={lists.length}
             isPremium={user.is_premium}
             onPress={() => setIsCreateListVisible(true)}
           />
