@@ -77,7 +77,6 @@ export default function ProfilePage() {
   };
 
   const handleLogoutAll = async () => {
-    console.log('Logout');
     await logoutUserFromAll(token);
     navigateTo('login');
   };
