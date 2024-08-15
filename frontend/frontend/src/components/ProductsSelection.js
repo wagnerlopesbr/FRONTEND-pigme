@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, View, Text, TextInput, Dimensions, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
 import { useAtom } from 'jotai/react';
@@ -12,7 +12,7 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
   const [token] = useAtom(tokenAtom);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState(new Set()); // Set instead of array because it's faster for lookups (O(1) vs O(n))
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,26 +26,36 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
     fetchProducts();
   }, []);
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  const toggleProductSelection = (product) => {
-    setSelectedProducts(prevSelectedProducts => {
-      if (prevSelectedProducts.some(p => p.id === product.id)) {
-        return prevSelectedProducts.filter(p => p.id !== product.id);
-      } else {
-        return [...prevSelectedProducts, product];
-      }
-    });
-  };
+  // Memoizing the filtered products to avoid re-filtering on every render
+  const filteredProducts = useMemo(() => {
+    return products.filter(product =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [products, searchQuery]);
 
-  const handleAddProducts = () => {
-    if (selectedProducts.length > 0) {
-      onAddProducts(selectedProducts);
+  // Using useCallback to memoize the function and avoid re-renders
+  const toggleProductSelection = useCallback((product) => {
+    setSelectedProducts(prevSelectedProducts => {
+      const newSelectedProducts = new Set(prevSelectedProducts);
+      if (newSelectedProducts.has(product.id)) {
+        newSelectedProducts.delete(product.id);
+      } else {
+        newSelectedProducts.add(product.id);
+      }
+      return newSelectedProducts;
+    });
+  }, []);
+
+  const handleAddProducts = useCallback(() => {
+    if (selectedProducts.size > 0) {
+      const productsToAdd = Array.from(selectedProducts).map(id =>
+        products.find(product => product.id === id)
+      );
+      onAddProducts(productsToAdd);
     }
-    setSelectedProducts([]);
+    setSelectedProducts(new Set());
     onClose();
-  };
+  }, [selectedProducts, products, onAddProducts, onClose]);
 
   return (
     <Modal
@@ -68,19 +78,23 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
             style={{ borderTopWidth: 1, borderTopColor: '#ddd', width: '100%' }}
             data={filteredProducts}
             keyExtractor={item => item.id}
+            extraData={selectedProducts}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            windowSize={5}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[
                   styles.productContainer,
                   {
-                    backgroundColor: selectedProducts.some(p => p.id === item.id) ? '#E0E0E0' : 'white',
+                    backgroundColor: selectedProducts.has(item.id) ? '#E0E0E0' : 'white',
                   },
                 ]}
                 onPress={() => toggleProductSelection(item)}
               >
                 <Text style={styles.productText}>{item.name} - {item.brand}</Text>
                 <CheckBox
-                  checked={selectedProducts.some(p => p.id === item.id)}
+                  checked={selectedProducts.has(item.id)}
                   onPress={() => toggleProductSelection(item)}
                   containerStyle={styles.checkboxContainer}
                 />
