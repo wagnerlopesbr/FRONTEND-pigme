@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TextInput, Dimensions, FlatList, TouchableWitho
 import Modal from 'react-native-modal';
 import { useAtom } from 'jotai/react';
 import { tokenAtom } from '../utils/jotai';
-import { getProductsWithNames } from '../utils/api_products_actions';
+import { getProductsAPI } from '../utils/api_products_actions';
 import { CheckBox } from 'react-native-elements';
 
 const { width } = Dimensions.get('window');
@@ -17,7 +17,7 @@ const ProductsSelection = ({ isVisible, onClose, onAddProducts }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await getProductsWithNames();
+        const response = await getProductsAPI();
         setProducts(response.products);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error.message || error);

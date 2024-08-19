@@ -61,7 +61,15 @@ const CheckList = ({ route }) => {
             {item.title || item.name} - {item.brand}
           </Text>
         </View>
-        <TouchableOpacity onPress={() => toggleProductSelection(item)}>
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: 100,
+            marginRight: -10,
+          }}
+          onPress={() => toggleProductSelection(item)}
+        >
           <CheckBox
             checked={selectedProducts.some(p => p.id === item.id)}
             onPress={() => toggleProductSelection(item)}
@@ -134,7 +142,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingLeft: 10,
+    paddingLeft: 5,
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
     justifyContent: 'space-between',
@@ -145,7 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   productText: {
-    fontSize: 16,
+    fontSize: 15,
     marginRight: 8,
     flex: 1,
   },

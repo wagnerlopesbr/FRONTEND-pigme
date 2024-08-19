@@ -3,10 +3,10 @@ import { StyleSheet, View, ScrollView, Dimensions, Text, TouchableOpacity } from
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Appbar } from 'react-native-paper';
 import ProfilePage from './ProfilePage';
-import NotFoundPage from './notFoundPage';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ListsPage from './ListsPage';
+import PremiumPage from './PremiumPage';
 import { userAtom, tokenAtom } from '../utils/jotai';
 import { useAtom } from 'jotai/react';
 import { logoutUser } from '../utils/crud_actions';
@@ -72,16 +72,18 @@ export default function MainPage() {
             ),
           }} 
         />
-        <Tab.Screen 
-          name="Premium" 
-          component={NotFoundPage} 
-          options={{ 
-            title: 'Premium',
-            tabBarIcon: ({ size }) => (
-              <Icon name="star" size={size} color='black' />
-            ),
-          }} 
-        />
+        {user.is_premium && (
+          <Tab.Screen 
+            name="Premium" 
+            component={PremiumPage} 
+            options={{ 
+              title: 'Premium',
+              tabBarIcon: ({ size }) => (
+                <Icon name="star" size={size} color='black' />
+              ),
+            }} 
+          />
+        )}
       </Tab.Navigator>
     </View>
   );
