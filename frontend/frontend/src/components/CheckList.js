@@ -66,7 +66,7 @@ const CheckList = ({ route }) => {
             flexDirection: 'row',
             alignItems: 'center',
             width: 100,
-            marginRight: -10,
+            marginRight: -50,
           }}
           onPress={() => toggleProductSelection(item)}
         >
