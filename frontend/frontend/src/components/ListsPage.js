@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Text, StyleSheet, RefreshControl } from 'react-native';
 import ListCard from './ListCard';
 import NewListCard from './NewListCard';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Slide from './Slide';
 import * as Animatable from 'react-native-animatable';
 import CreateList from './CreateList';
@@ -34,11 +34,9 @@ function ListsPage() {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchLists();
-    }, [token])
-  );
+  useEffect(() => {
+    fetchLists();
+  }, [lists]);
 
   const navigateTo = (route, params = {}) => { navigate.navigate(route, params) };
 

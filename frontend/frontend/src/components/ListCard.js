@@ -38,7 +38,7 @@ const ListCard = ({ index, item, isPremium, onEdit, onBuy }) => {
         ]}
       >
         <Text style={[styles.itemTitle, {color: titleFontColor}]}>
-          {(!isPremium && index > 2) ? `Lista Premium ${item.title}` : `Lista ${item.title}`}
+          {(!isPremium && index > 2) ? `${item.title}` : `${item.title}`}
         </Text>
         <TouchableOpacity onPress={toggleModal} style={{ marginRight: -5 }}>
           <Icon name="delete-circle" size={23} color='black' marginRight={10} />

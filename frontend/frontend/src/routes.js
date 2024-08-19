@@ -7,6 +7,8 @@ import CreateList from './components/CreateList'
 import NotFoundPage from './components/notFoundPage';
 import EditList from './components/EditList';
 import CheckList from './components/CheckList';
+import PremiumPage from './components/PremiumPage';
+import PremiumCheckList from './components/PremiumCheckList';
 
 
 const Stack = createNativeStackNavigator();
@@ -22,6 +24,8 @@ export default function Routes() {
             <Stack.Screen name="create-list" component={CreateList} options={{ headerShown: false }} />
             <Stack.Screen name="edit-list" component={EditList} options={{ headerShown: false }} />
             <Stack.Screen name="check-list" component={CheckList} options={{ headerShown: false }} />
+            <Stack.Screen name="premium-check-list" component={PremiumCheckList} options={{ headerShown: false }} />
+            <Stack.Screen name="premium" component={PremiumPage} options={{ headerShown: false }} />
         </Stack.Navigator>
     )
 }

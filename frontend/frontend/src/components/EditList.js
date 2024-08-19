@@ -56,7 +56,7 @@ const EditList = ({ route }) => {
   try {
     const transformedProducts = list.products.map(product => ({
       title: product.name || product.title,
-      price: product.price,
+      prices: product.prices,
       brand: product.brand,
       quantity: product.quantity || 1,
       id: product.id,
@@ -81,7 +81,7 @@ const EditList = ({ route }) => {
   const handleAddProducts = (products) => {
     const transformedProducts = products.map(product => ({
       brand: product.brand,
-      price: product.price,
+      prices: product.prices,
       title: product.name || product.title,
       quantity: product.quantity || 1,
       id: product.id,

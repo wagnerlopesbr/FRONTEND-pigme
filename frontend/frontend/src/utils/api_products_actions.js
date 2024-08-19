@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 
 const API_PRODUCTS_URL = Constants.expoConfig.extra?.API_PRODUCTS_URL;
 
-const getProductsWithNames = async () => {
+const getProductsAPI = async () => {
   try {
     if (!API_PRODUCTS_URL) {
       throw new Error('API_PRODUCTS_URL não está definida nas constantes de configuração.');
@@ -26,7 +26,8 @@ const getProductsWithNames = async () => {
 
     return {
       ...data,
-      products: productsWithNames
+      products: productsWithNames,
+      supermarkets: response.data.supermarkets,
     };
 
   } catch (error) {
@@ -35,4 +36,4 @@ const getProductsWithNames = async () => {
   }
 };
 
-export { getProductsWithNames };
+export { getProductsAPI };
