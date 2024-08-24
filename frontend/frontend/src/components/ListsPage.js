@@ -7,23 +7,17 @@ import Slide from './Slide';
 import * as Animatable from 'react-native-animatable';
 import CreateList from './CreateList';
 import { getLists } from '../utils/crud_actions';
-import { tokenAtom, userAtom } from '../utils/jotai';
+import { tokenAtom, userAtom, listsAtom } from '../utils/jotai';
 import { useAtom } from 'jotai/react';
 
 
 function ListsPage() {
   const [isCreateListVisible, setIsCreateListVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [lists, setLists] = useState([]);
+  const [lists, setLists] = useAtom(listsAtom);
   const [token] = useAtom(tokenAtom);
   const [user] = useAtom(userAtom);
   const navigate = useNavigation();
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchLists();
-    setRefreshing(false);
-  };
 
   const fetchLists = async () => {
     try {
@@ -36,7 +30,13 @@ function ListsPage() {
 
   useEffect(() => {
     fetchLists();
-  }, [lists]);
+  }, [refreshing]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchLists();
+    setRefreshing(false);
+  };
 
   const navigateTo = (route, params = {}) => { navigate.navigate(route, params) };
 
@@ -49,7 +49,9 @@ function ListsPage() {
   };
 
   const handleCreateList = (listName) => {
+    fetchLists();
     setIsCreateListVisible(false);
+    onRefresh();
   };
 
 

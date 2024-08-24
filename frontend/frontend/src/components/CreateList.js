@@ -40,11 +40,11 @@ const CreateList = ({ isVisible, onClose, onCreate }) => {
           />
           <Text style={{ color: 'gray', marginBottom: 25 }}>Adicione produtos à lista depois de criá-la.</Text>
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.button} onPress={handleCreate}>
-              <Text style={styles.buttonText}>Confirmar</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleCreate}>
+              <Text style={styles.buttonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
         </View>
