@@ -97,7 +97,7 @@ const PremiumCheckList = ({ route }) => {
         </Text>
       </View>
       <View style={styles.priceContainer}>
-        <Text style={{ fontWeight: 'bold' }}>{`R$ ${stringifiedPrice(productPrice)}`}</Text>
+        <Text style={{ fontWeight: 'bold' }}>{`unidade:\nR$ ${stringifiedPrice(productPrice)}`}</Text>
         <CheckBox
           checked={selectedProducts.some(p => p.id === item.id)}
           onPress={() => toggleProductSelection(item)}
