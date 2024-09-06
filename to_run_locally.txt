@@ -1,1 +1,2 @@
+cd frontend/frontend/
 npm run android
