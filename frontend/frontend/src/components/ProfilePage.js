@@ -40,8 +40,8 @@ export default function ProfilePage() {
     };
     await updateUser(updatedProfile, token);
     Alert.alert(
-      'Perfil salvo',
       'As informações do perfil foram atualizadas.',
+      'Por favor, faça login novamente para ver as alterações.',
       [
         {
           text: 'OK',

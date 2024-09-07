@@ -29,8 +29,8 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "BACKEND_CRUD_URL": "http://10.0.2.2:8001/api/",
-      "API_PRODUCTS_URL": "http://10.0.2.2:8000/api/dev/",
+      "BACKEND_CRUD_URL": "BACKEND_CRUD_URL",
+      "API_PRODUCTS_URL": "API_PRODUCTS_URL",
       "GOOGLE_MAPS_API_KEY": "GOOGLE_MAPS_API_KEY"
     }
   }

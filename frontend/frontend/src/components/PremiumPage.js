@@ -24,12 +24,18 @@ function PremiumPage() {
   const [supermarketsNames, setSupermarketsNames] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [radius, setRadius] = useState(1);
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState('');
   const [supermarketsLocations, setSupermarketsLocations] = useState([]);
+
 
   const saveSelectedSupermarkets = async (selectedSupermarkets) => {
     try {
-      await AsyncStorage.setItem('@selectedSupermarkets', JSON.stringify(Array.from(selectedSupermarkets)));
+      const selectedArray = Array.from(selectedSupermarkets);
+      const existingData = await AsyncStorage.getItem('@selectedSupermarkets');
+      if (existingData && JSON.stringify(selectedArray) === existingData) {
+        return;
+      }
+      await AsyncStorage.setItem('@selectedSupermarkets', JSON.stringify(selectedArray));
     } catch (error) {
       console.error('Erro ao salvar supermercados selecionados:', error);
     }
@@ -59,13 +65,6 @@ function PremiumPage() {
     outputRange: [61, 320],
   });
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchLists();
-    await fetchSupermarkets();
-    setRefreshing(false);
-  };
-
   const fetchLists = async () => {
     try {
       const fetchedLists = await getLists(token);
@@ -83,15 +82,25 @@ function PremiumPage() {
 
       const supermarketLocations = await Promise.all(fetchedSupermarkets.map(async (supermarket) => {
         if (supermarket.address) {
-          const location = await geocodeAddress(supermarket.address);
-          return {
-            ...supermarket,
-            latitude: location?.latitude || 0,
-            longitude: location?.longitude || 0,
+          try {
+            const location = await geocodeAddress(supermarket.address);
+            return {
+              ...supermarket,
+              latitude: location?.latitude || 0,
+              longitude: location?.longitude || 0,
+            };
+          } catch (geocodeError) {
+            console.error('Erro na geocodificação:', geocodeError);
+            return {
+              ...supermarket,
+              latitude: 0,
+              longitude: 0,
+            };
           }
         }
         return supermarket;
-      }))
+      }));
+
       setSupermarketsLocations(supermarketLocations);
       return fetchedSupermarkets;
     } catch (error) {
@@ -99,6 +108,7 @@ function PremiumPage() {
       return [];
     }
   };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -113,12 +123,33 @@ function PremiumPage() {
         const location = await geocodeZipCode(user.zip_code);
         if (location) {
           setUserLocation(location);
+        } else {
+          console.warn('Não foi possível obter a localização.');
         }
       }
-    };    
-    
+    };
+
     fetchData();
   }, [user.zip_code]);
+
+  useEffect(() => {
+    if (userLocation) {
+      updateSelectedSupermarkets(supermarketsLocations, userLocation, radius);
+    }
+  }, [radius, userLocation]);
+
+  const updateSelectedSupermarkets = useCallback((locations, center, radius) => {
+    const updatedSelection = new Set();
+    locations.forEach(location => {
+      const distance = getDistance(center, { latitude: location.latitude, longitude: location.longitude });
+      if (distance <= radius) {
+        updatedSelection.add(location.id);
+      }
+    }
+    );
+    setSelectedSupermarkets(updatedSelection);
+  }, [supermarketsLocations]);
+
 
   const toggleSupermarketSelection = useCallback((supermarket) => {
     setSelectedSupermarkets(prevSelectedSupermarkets => {
@@ -147,14 +178,6 @@ function PremiumPage() {
     setSelectedSupermarkets(new Set());
   };
 
-  const filterSupermarketsByRadius = (locations, center, radius) => {
-    const radiusInKm = radius; // Assume radius is already in km
-    return locations.filter(location => {
-      const distance = getDistance(center, { latitude: location.latitude, longitude: location.longitude });
-      return distance <= radiusInKm; // Use km directly
-    });
-  };
-
   // Utility function to calculate distance between two points
   const getDistance = (point1, point2) => {
     const toRad = (value) => value * Math.PI / 180;
@@ -167,11 +190,20 @@ function PremiumPage() {
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; // Distance in km
     return distance;
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchLists();
+    const fetchedSupermarkets = await fetchSupermarkets();
+    const storedSelections = await loadSelectedSupermarkets();
+    setSelectedSupermarkets(storedSelections); // Update state with stored selections
+    setRefreshing(false);
   };
 
   return (
@@ -198,14 +230,26 @@ function PremiumPage() {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, paddingRight: 0 }}>
               <TouchableOpacity onPress={selectAllSupermarkets} style={{ flexDirection: 'row', borderWidth: 1, borderColor: '#00D71D', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2, backgroundColor: '#00D71D' }}>
                 <Icon name="all-inclusive" size={25} color='white' />
-                <Text style={{ fontSize: 18, color: 'white' , fontWeight: 'bold', marginLeft: 15 }}>TODOS</Text>
+                <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', marginLeft: 15 }}>TODOS</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.modalButton}>
+              <TouchableOpacity
+                disabled={userLocation === null}
+                onPress={() => setModalVisible(true)}
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 1,
+                  borderColor: 'blue',
+                  borderRadius: 5,
+                  paddingHorizontal: 5,
+                  paddingVertical: 2,
+                  backgroundColor: 'blue',
+                }}
+              >
                 <Icon name="google-maps" size={25} color='white' />
-                <Text style={styles.modalButtonText}>MAPA</Text>
+                <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', marginLeft: 15 }}>MAPA</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={cleanSelection} style={{ flexDirection: 'row', borderWidth: 1, borderColor: '#D70000', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2, backgroundColor: '#D70000' }}>
-                <Text style={{ fontSize: 18, color: 'white' , fontWeight: 'bold', marginRight: 15 }}>LIMPAR</Text>
+                <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', marginRight: 15 }}>LIMPAR</Text>
                 <Icon name="broom" size={25} color='white' />
               </TouchableOpacity>
             </View>
@@ -247,6 +291,7 @@ function PremiumPage() {
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                   }}
+                  mapType="satellite"
                 >
                   {userLocation && (
                     <>
@@ -270,12 +315,12 @@ function PremiumPage() {
                       />
                     </>
                   )}
-                  {filterSupermarketsByRadius(supermarketsLocations, userLocation, radius).map((supermarket) => (
+                  {supermarketsLocations.map((supermarket) => (
                     <Marker
                       key={supermarket.id}
                       coordinate={{ latitude: supermarket.latitude, longitude: supermarket.longitude }}
                       title={supermarket.name}
-                      pinColor='blue'
+                      pinColor={'blue'}
                       opacity={0.9}
                     />
                   ))}
@@ -284,8 +329,25 @@ function PremiumPage() {
                   onPress={() => setModalVisible(false)}
                   style={{ position: 'absolute', top: 40, right: 20, zIndex: 1 }}
                 >
-                  <Icon name="close" size={30} color='black' />
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: 'red',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 6,
+                      elevation: 5,
+                    }}
+                  >
+                    <Icon name="close" size={30} color='white' />
+                  </View>
                 </TouchableOpacity>
+
                 <View style={{ position: 'absolute', bottom: 30, width: '100%', padding: 20, backgroundColor: 'rgba(0, 0, 0, 0.88)' }}>
                   <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18 }}>Raio: {radius.toFixed(3)}m</Text>
                   <Slider
@@ -294,7 +356,12 @@ function PremiumPage() {
                     maximumValue={10}
                     step={0.1}
                     value={radius}
-                    onValueChange={(value) => setRadius(value)}
+                    onValueChange={(value) => {
+                      setRadius(value);
+                      if (userLocation) {
+                        updateSelectedSupermarkets(supermarketsLocations, userLocation, value);
+                      }
+                    }}
                     minimumTrackTintColor="#1EB1FC"
                     maximumTrackTintColor="#d3d3d3"
                   />

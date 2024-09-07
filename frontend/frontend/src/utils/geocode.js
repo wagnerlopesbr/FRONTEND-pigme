@@ -8,23 +8,30 @@ export const geocodeZipCode = async (zipCode) => {
     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
       params: {
         address: zipCode,
-        key: GOOGLE_MAPS_API_KEY
-      }
+        key: GOOGLE_MAPS_API_KEY,
+      },
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
     });
 
-    if (response.data.status === 'OK') {
-      const location = response.data.results[0].geometry.location;
-      return {
-        latitude: location.lat,
-        longitude: location.lng
-      };
+    if (response.data.status === 'OK' && response.data.results.length > 0) {
+      const location = response.data.results[0]?.geometry?.location;
+      if (location) {
+        return {
+          latitude: location.lat,
+          longitude: location.lng,
+        };
+      }
+    } else if (response.data.status === 'ZERO_RESULTS') {
+      console.error('Nenhum resultado encontrado para o código postal fornecido.');
     } else {
-      throw new Error('Geocoding API returned an error');
+      console.error('Erro retornado pela API de geocodificação:', response.data.status);
     }
   } catch (error) {
     console.error('Erro ao geocodificar o zip_code:', error);
-    return null;
   }
+  return null;
 };
 
 export const geocodeAddress = async (address) => {
@@ -32,21 +39,28 @@ export const geocodeAddress = async (address) => {
     const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
       params: {
         address: address,
-        key: GOOGLE_MAPS_API_KEY
-      }
+        key: GOOGLE_MAPS_API_KEY,
+      },
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
     });
 
-    if (response.data.status === 'OK') {
-      const location = response.data.results[0].geometry.location;
-      return {
-        latitude: location.lat,
-        longitude: location.lng
-      };
+    if (response.data.status === 'OK' && response.data.results.length > 0) {
+      const location = response.data.results[0]?.geometry?.location;
+      if (location) {
+        return {
+          latitude: location.lat,
+          longitude: location.lng,
+        };
+      }
+    } else if (response.data.status === 'ZERO_RESULTS') {
+      console.error('Nenhum resultado encontrado para o endereço fornecido.');
     } else {
-      throw new Error('Geocoding API returned an error');
+      console.error('Erro retornado pela API de geocodificação:', response.data.status);
     }
   } catch (error) {
     console.error('Erro ao geocodificar o endereço:', error);
-    return null;
   }
+  return null;
 };
