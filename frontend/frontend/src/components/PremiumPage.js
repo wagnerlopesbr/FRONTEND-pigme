@@ -166,7 +166,7 @@ function PremiumPage() {
       saveSelectedSupermarkets(newSelectedSupermarkets);
       return newSelectedSupermarkets;
     });
-  }, [supermarketsNames]);
+  }, [supermarketsNames, selectedSupermarkets]);
 
 
   const selectAllSupermarkets = () => {
@@ -200,9 +200,6 @@ function PremiumPage() {
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchLists();
-    const fetchedSupermarkets = await fetchSupermarkets();
-    const storedSelections = await loadSelectedSupermarkets();
-    setSelectedSupermarkets(storedSelections); // Update state with stored selections
     setRefreshing(false);
   };
 
