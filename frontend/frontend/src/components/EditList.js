@@ -148,11 +148,12 @@ const EditList = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Título:</Text>
+      <Text style={styles.label}>Título: <Text style={{ fontSize: 14, fontStyle: "italic" }}>(no máximo 10 caracteres)</Text></Text>
       <TextInput
         style={styles.input}
         value={list.title}
         onChangeText={(text) => handleInputChange('title', text)}
+        maxLength={10}
       />
       <View style={styles.headerContainer}>
         <Text style={[ styles.label, { paddingTop: 0, paddingBottom: 3 }]}>

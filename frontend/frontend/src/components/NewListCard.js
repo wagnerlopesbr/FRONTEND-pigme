@@ -1,34 +1,25 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import tinycolor from 'tinycolor2';
+
 
 const NewListCard = ({ index, isPremium, onPress }) => {
-  const titleColor = (!isPremium && index > 2) ? 'black' : '#478BFF';
-  const borderColor = (!isPremium && index > 2) ? 'black' : `${titleColor}`;
-  const backgroundColor = (!isPremium && index > 2) ? `rgba(0, 0, 0, 0.5)` : `${titleColor}50`;
-  const titleFontColor = (!isPremium && index > 2) ? `#41413E` : `white`;
+  const mainColor = (!isPremium && index > 2) ? 'black' : `#86DE60`;
+  const backgroundColor = (!isPremium && index > 2) ? `rgba(0, 0, 0, 0.5)` : tinycolor(mainColor).lighten(25).toString();
+  const titleFontColor = "#2F2F2F";
 
   return (
     <View
       style={[
         styles.itemContainer,
         (!isPremium && index > 2) && styles.premiumItemContainer,
-        { borderColor: borderColor }
+        { borderColor: mainColor }
       ]}
     >
-      <View
-        style={[
-          styles.itemTitleContainer,
-          { backgroundColor: titleColor }
-        ]}
-      >
-        <Text style={[styles.itemTitle, {color: titleFontColor}]}>
-          {(!isPremium && index > 2) ? `Nova Lista Premium` : `Nova Lista`}
-        </Text>
-      </View>
       <View style={[styles.buttonsContainer, { backgroundColor: backgroundColor }]}>
         <TouchableOpacity disabled={(!isPremium && index > 2)} style={styles.button} onPress={onPress}>
-          <Icon name="file-plus-outline" size={55} color="#4E4E11" />
+          <Icon name="file-plus-outline" size={55} color={tinycolor('#5FAF3D').lighten(5).toString()} />
         </TouchableOpacity>
       </View>
       {(!isPremium && index > 2) && (
@@ -46,7 +37,7 @@ const styles = StyleSheet.create({
     height: 125,
     marginBottom: 15,
     borderRadius: 5,
-    borderWidth: 5,
+    borderWidth: 2,
     borderColor: 'transparent',
     justifyContent: 'space-between',
     overflow: 'hidden',
@@ -71,7 +62,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    height: 100,
+    height: '100%',
     width: '100%',
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -79,6 +70,8 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     marginHorizontal: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   iconContainer: {
