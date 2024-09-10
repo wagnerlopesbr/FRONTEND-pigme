@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MapView, { Marker, Circle } from 'react-native-maps';
 import { geocodeZipCode, geocodeAddress } from '../utils/geocode';
 import Slider from '@react-native-community/slider';
+import tinycolor from 'tinycolor2';
 
 function PremiumPage() {
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +63,7 @@ function PremiumPage() {
 
   const heightInterpolation = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [61, 320],
+    outputRange: [56, 320],
   });
 
   const fetchLists = async () => {
@@ -203,6 +204,13 @@ function PremiumPage() {
     setRefreshing(false);
   };
 
+  const mainColor = `#C1A1A1`;
+  const titleColor = tinycolor(mainColor).lighten(25).toString();
+  const flatListLineColor =  tinycolor(mainColor).lighten(15).toString();
+  const rowColor = tinycolor(mainColor).lighten(30).toString();
+  const buttonColor = tinycolor(mainColor).lighten(35).toString();
+  const titleFontColor = "#2F2F2F";
+
   return (
     <View style={styles.userListsContainer}>
       <Animated.View
@@ -213,9 +221,13 @@ function PremiumPage() {
       >
         <TouchableOpacity
           onPress={toggleExpand}
-          style={[
-            styles.itemTitleContainer,
-          ]}
+          style={
+            [
+              isExpanded
+              ? [styles.itemTitleContainerOpen, { backgroundColor: titleColor, borderColor: mainColor, borderWidth: 2, borderBottomWidth: 0 } ]
+              : [styles.itemTitleContainerClosed, { backgroundColor: titleColor, borderColor: mainColor, borderWidth: 2 }]
+            ]
+          }
         >
           <Text style={styles.itemTitle}>
             Escolha os Supermercados
@@ -224,34 +236,26 @@ function PremiumPage() {
         </TouchableOpacity>
         {isExpanded && (
           <View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, paddingRight: 0 }}>
-              <TouchableOpacity onPress={selectAllSupermarkets} style={{ flexDirection: 'row', borderWidth: 1, borderColor: '#00D71D', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2, backgroundColor: '#00D71D' }}>
-                <Icon name="all-inclusive" size={25} color='white' />
-                <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', marginLeft: 15 }}>TODOS</Text>
+            <View style={[styles.buttonsContainer, { backgroundColor: titleColor, borderColor: mainColor, borderTopWidth: 0, borderBottomWidth: 0 }]}>
+              <TouchableOpacity onPress={selectAllSupermarkets} style={[styles.buttonsContainerLeft, { borderColor: titleColor, backgroundColor: buttonColor }]}>
+                <Icon name="all-inclusive" size={25} color='#1C1C1C' />
+                <Text style={{ fontSize: 18, color: '#1C1C1C', fontWeight: '600', marginLeft: 10 }}>Todos</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 disabled={userLocation === null}
                 onPress={() => setModalVisible(true)}
-                style={{
-                  flexDirection: 'row',
-                  borderWidth: 1,
-                  borderColor: 'blue',
-                  borderRadius: 5,
-                  paddingHorizontal: 5,
-                  paddingVertical: 2,
-                  backgroundColor: 'blue',
-                }}
+                style={[styles.buttonsContainerMiddle, { borderColor: titleColor, backgroundColor: buttonColor }]}
               >
-                <Icon name="google-maps" size={25} color='white' />
-                <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', marginLeft: 15 }}>MAPA</Text>
+                <Icon name="google-maps" size={25} color='#1C1C1C' />
+                <Text style={{ fontSize: 18, color: '#1C1C1C', fontWeight: '600', marginLeft: 8 }}>Mapa</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={cleanSelection} style={{ flexDirection: 'row', borderWidth: 1, borderColor: '#D70000', borderRadius: 5, paddingHorizontal: 5, paddingVertical: 2, backgroundColor: '#D70000' }}>
-                <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold', marginRight: 15 }}>LIMPAR</Text>
-                <Icon name="broom" size={25} color='white' />
+              <TouchableOpacity onPress={cleanSelection} style={[styles.buttonsContainerRight, { borderColor: titleColor, backgroundColor: buttonColor }]}>
+                <Text style={{ fontSize: 18, color: '#1C1C1C', fontWeight: '600', marginRight: 10 }}>Limpar</Text>
+                <Icon name="broom" size={25} color='#1C1C1C' />
               </TouchableOpacity>
             </View>
             <FlatList
-              style={{ borderTopWidth: 1, borderTopColor: '#ddd', width: '100%', marginBottom: 20 }}
+              style={[styles.flatlistContainer, { backgroundColor: rowColor, borderColor: mainColor, borderWidth: 2, borderTopWidth: 1 }]}
               data={supermarkets}
               extraData={selectedSupermarkets}
               keyExtractor={item => item.id}
@@ -259,7 +263,7 @@ function PremiumPage() {
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => toggleSupermarketSelection(item)}
-                  style={styles.supermarketContainer}
+                  style={[styles.supermarketContainer, { borderBottomColor: flatListLineColor }]}
                 >
                   <View style={styles.supermarketItemContainer}>
                     <CheckBox
@@ -368,6 +372,7 @@ function PremiumPage() {
           </View>
         )}
       </Animated.View>
+      {!isExpanded && <View style={styles.line} />}
       <ScrollView
         contentContainerStyle={styles.listContainer}
         style={styles.scrollView}
@@ -393,6 +398,88 @@ export default PremiumPage;
 
 
 const styles = StyleSheet.create({
+  line: {
+    width: '97%',
+    height: 2,
+    backgroundColor: '#A8A8A8',
+    alignSelf: 'center',
+    marginTop: 5,
+    marginBottom: 5,
+    rounded: 1
+  },
+  flatlistContainer: {
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    borderBottomWidth: 2,
+    borderBottomColor: '#d3d3d3',
+    borderRightWidth: 2,
+    borderRightColor: '#d3d3d3',
+    borderLeftWidth: 2,
+    borderLeftColor: '#d3d3d3',
+    width: '100%',
+    height: '73%',
+    marginBottom: 20,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+  listContainer: {
+    paddingHorizontal: 5,
+    paddingTop: 2,
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: 'lightgray',
+    paddingBottom: 5,
+  },
+  buttonsContainerLeft: {
+    width: '31%',
+    height: '100%',
+    borderRadius: 3,
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderRightWidth: 1,
+    borderColor: 'lightgray',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 2,
+    backgroundColor: '#E0E0E0',
+  },
+  buttonsContainerMiddle: {
+    marginHorizontal: -10,
+    width: '31%',
+    height: '100%',
+    borderRadius: 3,
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderRightWidth: 2,
+    borderLeftWidth: 2,
+    left: 0,
+    borderColor: 'lightgray',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 2,
+    backgroundColor: '#E0E0E0',
+  },
+  buttonsContainerRight: {
+    width: '31%',
+    height: '100%',
+    borderRadius: 3,
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderLeftWidth: 1,
+    borderColor: 'lightgray',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 2,
+    backgroundColor: '#E0E0E0',
+  },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -490,14 +577,29 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderColor: 'transparent',
     overflow: 'hidden',
+    marginTop: 5,
   },
-  itemTitleContainer: {
+  itemTitleContainerOpen: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
     backgroundColor: 'lightgray',
     padding: 10,
     alignItems: 'center',
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+  },
+  itemTitleContainerClosed: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    backgroundColor: 'lightgray',
+    padding: 10,
+    alignItems: 'center',
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
   },
   itemTitle: {
     fontSize: 16,
@@ -530,13 +632,5 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: '#FFF9F9',
-  },
-  listContainer: {
-    paddingHorizontal: 15,
-    paddingTop: 15,
-    width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
+  }
 });

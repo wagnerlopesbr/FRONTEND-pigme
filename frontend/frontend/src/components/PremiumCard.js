@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import tinycolor from 'tinycolor2';
 
 const PremiumCard = ({ item, supermarkets, supermarketsIds }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -28,13 +29,15 @@ const PremiumCard = ({ item, supermarkets, supermarketsIds }) => {
     }).start();
   };
 
-  const titleColor = '#FFB047';
-  const borderColor = `${titleColor}`;
-  const backgroundColor = `${titleColor}50`;
-  const titleFontColor = `white`;
+  const mainColor = `#DBBC7F`;
+  const titleColor = tinycolor(mainColor).lighten(25).toString();
+  const backgroundColor = tinycolor(mainColor).lighten(25).toString();
+  const flatListLineColor = tinycolor(mainColor).lighten(15).toString();
+  const titleFontColor = "#2F2F2F";
+  const rowColor = tinycolor(mainColor).lighten(30).toString();
 
-  const baseHeight = 51;
-  const rowHeight = 51;
+  const baseHeight = isExpanded ? 51 : 44;
+  const rowHeight = isExpanded ? 51 : 44;
 
   const heightInterpolation = animation.interpolate({
     inputRange: [0, 1],
@@ -58,7 +61,7 @@ const PremiumCard = ({ item, supermarkets, supermarketsIds }) => {
     <Animated.View
       style={[
         styles.itemContainer,
-        { borderColor: borderColor, height: heightInterpolation }
+        { borderColor: mainColor, height: heightInterpolation }
       ]}
     >
       <TouchableOpacity
@@ -68,7 +71,7 @@ const PremiumCard = ({ item, supermarkets, supermarketsIds }) => {
           { backgroundColor: titleColor }
         ]}
       >
-        <Text style={[styles.itemTitle, {color: titleFontColor}]}>
+        <Text style={[styles.itemTitle, { color: titleFontColor, fontWeight: '900' }]}>
           {`${item.title}`}
         </Text>
         <Icon name={isExpanded ? "chevron-up" : "chevron-down"} size={23} color='black' />
@@ -82,13 +85,13 @@ const PremiumCard = ({ item, supermarkets, supermarketsIds }) => {
             return (
               <View key={supermarketId} style={styles.supermarketRow}>
                 <TouchableOpacity
-                  style={[styles.button, { backgroundColor: index % 2 === 0 ? '#FFF2DF' : '#FFE7C7' }]}
+                  style={[styles.button, { backgroundColor: rowColor, borderBottomColor: flatListLineColor }]}
                   onPress={() => handleBuy(item.id, supermarketId)}
                 >
                   <Text style={{ color: 'black', fontSize: 16 }}>{supermarketName}</Text>
                   <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <Text style={{ marginRight: 10, alignSelf: 'center', fontSize: 14, fontWeight: 'bold' }}>{`R$ ${stringifiedPrice(total)}`}</Text> 
-                    <Icon name="cart-variant" size={30} color={"#4E4E11"} />
+                    <Icon name="cart-variant" size={30} color={"#2F2F2F"} />
                   </View>
                 </TouchableOpacity>
               </View>
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    height: 51,
+    height: 'auto',
   },
   itemContainer: {
     width: '100%',
@@ -119,14 +122,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    height: 40,
     backgroundColor: 'black',
-    padding: 10,
+    paddingHorizontal: 10,
     alignItems: 'center',
   },
   itemTitle: {
     fontSize: 16,
+    paddingBottom: 2,
     fontWeight: 'bold',
-    color: 'white',
+    color: 'black',
   },
   buttonsContainer: {
     flexDirection: 'column',

@@ -27,7 +27,6 @@ function ListsPage() {
       console.error('Erro ao buscar listas:', error.message || error);
     }
   };
-  console.log('listas:', lists);
 
   useEffect(() => {
     fetchLists();

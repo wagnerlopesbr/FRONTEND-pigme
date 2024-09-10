@@ -26,7 +26,6 @@ const loginUser = async (userData) => {
     const response = await axios.post(`${BACKEND_CRUD_URL}login/`, userData);
     return response.data;
   } catch (error) {
-    console.log('url: ', BACKEND_CRUD_URL);
     console.error('Erro ao logar usuário:', error.message || error);
     throw error;
   }
