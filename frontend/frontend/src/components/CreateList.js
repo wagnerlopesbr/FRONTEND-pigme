@@ -12,10 +12,10 @@ const CreateList = ({ isVisible, onClose, onCreate }) => {
   const [token] = useAtom(tokenAtom);
   const [listName, setListName] = useState('');
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (listName.trim()) {
       const payload = { title: listName, products: [] };
-      createList(payload, token);
+      await createList(payload, token);
       onCreate(listName);
       setListName('');
     }

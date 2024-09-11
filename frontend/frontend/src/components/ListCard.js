@@ -6,7 +6,7 @@ import { useAtom } from 'jotai/react';
 import { deleteList } from '../utils/crud_actions';
 import tinycolor from 'tinycolor2';
 
-const ListCard = ({ index, item, isPremium, onEdit, onBuy }) => {
+const ListCard = ({ index, item, isPremium, onEdit, onBuy, onDelete }) => {
   const [token] = useAtom(tokenAtom);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const toggleModal = () => {
@@ -15,6 +15,7 @@ const ListCard = ({ index, item, isPremium, onEdit, onBuy }) => {
 
   const handleConfirm = async () => {
     await deleteList(item.id, token);
+    onDelete(item.id);
     toggleModal();
   };
 

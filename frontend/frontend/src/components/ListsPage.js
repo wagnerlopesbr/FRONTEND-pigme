@@ -48,10 +48,13 @@ function ListsPage() {
     navigateTo('check-list', { listId: item.id });
   };
 
-  const handleCreateList = (listName) => {
+  const handleDelete = (listId) => {
+    setLists(lists.filter(item => item.id !== listId));
+  };
+
+  const handleCreateList = () => {
     fetchLists();
     setIsCreateListVisible(false);
-    onRefresh();
   };
 
 
@@ -72,6 +75,7 @@ function ListsPage() {
             isPremium={user.is_premium}
             onEdit={handleEdit}
             onBuy={handleBuy}
+            onDelete={handleDelete}
           />
         ))}
         {lists.length < 10 && (
@@ -95,10 +99,10 @@ function ListsPage() {
         </Animatable.Text>
       }
       {!user.is_premium && <Slide />}
-      <CreateList 
-        isVisible={isCreateListVisible} 
-        onClose={() => setIsCreateListVisible(false)} 
-        onCreate={handleCreateList} 
+      <CreateList
+        isVisible={isCreateListVisible}
+        onClose={() => setIsCreateListVisible(false)}
+        onCreate={handleCreateList}
       />
     </View>
   );
