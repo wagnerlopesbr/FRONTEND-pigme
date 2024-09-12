@@ -163,9 +163,9 @@ const styles = StyleSheet.create({
     height: 60,
   },
   tabBar: {
-    backgroundColor: '#FFCA36',
+    backgroundColor: '#FFE84C',
     borderTopWidth: 1,
-    borderTopColor: '#FFCA36',
+    borderTopColor: '#FFE84C',
     color: 'black',
   },
   tabBarLabel: {

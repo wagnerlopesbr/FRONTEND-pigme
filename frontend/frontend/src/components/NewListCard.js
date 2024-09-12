@@ -19,7 +19,7 @@ const NewListCard = ({ index, isPremium, onPress }) => {
     >
       <View style={[styles.buttonsContainer, { backgroundColor: backgroundColor }]}>
         <TouchableOpacity disabled={(!isPremium && index > 2)} style={styles.button} onPress={onPress}>
-          <Icon name="file-plus-outline" size={55} color={tinycolor('#5FAF3D').lighten(5).toString()} />
+          <Icon name="file-plus-outline" size={55} color={(!isPremium && index > 2) ? titleFontColor : tinycolor('#5FAF3D').lighten(5).toString()} />
         </TouchableOpacity>
       </View>
       {(!isPremium && index > 2) && (

@@ -94,8 +94,21 @@ export default function ProfilePage() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Meus Dados</Text>
-      
+      <View style={styles.subHeader}>
+        <Text style={styles.title}>Meus Dados</Text>
+        {profile.isPremium && (
+          <View style={styles.premiumContainer}>
+            <Text style={styles.premiumLabel}>Premium:</Text>
+            <Icon
+              name="star"
+              size={24}
+              marginBottom={10}
+              color={profile.isPremium ? 'orange' : 'gray'}
+            />
+          </View>
+        )}
+      </View>
+
       <View style={styles.row}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Nome:</Text>
@@ -107,6 +120,9 @@ export default function ProfilePage() {
             onChangeText={(text) => handleInputChange('first_name', text)}
           />
         </View>
+      </View>
+
+      <View style={styles.row}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Sobrenome:</Text>
           <TextInput
@@ -130,6 +146,9 @@ export default function ProfilePage() {
             onChangeText={(text) => handleInputChange('zip_code', text)}
           />
         </View>
+      </View>
+
+      <View style={styles.row}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email:</Text>
           <TextInput
@@ -143,36 +162,19 @@ export default function ProfilePage() {
         </View>
       </View>
 
-      <View style={styles.row}>
-        <View style={styles.premiumContainer}>
-          <Text style={styles.label}>Premium:</Text>
-          <Icon
-            name="star"
-            size={24}
-            marginBottom={8}
-            color={profile.isPremium ? 'orange' : 'gray'}
-          />
-        </View>
-      </View>
-      <View style={styles.row}>
-        <View style={{ width: 170 }}>
-          <TouchableOpacity style={styles.changePasswordButton} onPress={toggleModal}>
-            <Text style={styles.changePasswordButtonText}>Alterar Senha</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ width: 170 }}>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Salvar Dados</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.changePasswordButton} onPress={toggleModal}>
+          <Text style={styles.buttonText}>Alterar Senha</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.buttonText}>Salvar Dados</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={{ width: 150, alignSelf: 'center', paddingTop: 130 }}>
-        <Button
-          title="Sair de Todos Dispositivos"
-          onPress={handleLogoutAll}
-          color={'#E11818'}
-        />
+      <View style={styles.logoutButtonContainer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogoutAll}>
+          <Text style={styles.logoutButtonText}>Sair de Todos Dispositivos</Text>
+        </TouchableOpacity>
       </View>
 
       <Modal
@@ -208,17 +210,13 @@ export default function ProfilePage() {
               value={confirmNewPassword}
               onChangeText={(text) => setConfirmNewPassword(text)}
             />
-            <View style={[styles.row, { paddingTop: 20 }]}>
-              <View style={{ width: 120 }}>
-                <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
-                  <Text style={styles.closeButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{ width: 120 }}>
-                <TouchableOpacity style={styles.submitButton} onPress={handleChangePassword}>
-                  <Text style={styles.submitButtonText}>Confirmar</Text>
-                </TouchableOpacity>
-              </View>
+            <View style={styles.modalButtonRow}>
+              <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.submitButton} onPress={handleChangePassword}>
+                <Text style={styles.buttonText}>Confirmar</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -234,6 +232,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginRight: 8,
   },
+  premiumLabel: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingBottom: 10,
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   input: {
     height: 50,
@@ -258,22 +261,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginBottom: 16
+    marginBottom: 8
+  },
+  subHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
   inputContainer: {
     flex: 1,
     marginRight: 8,
   },
   premiumContainer: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 8,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 16,
+    marginBottom: 16,
+    width: '100%',
   },
   saveButton: {
     backgroundColor: 'green',
@@ -281,11 +290,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 4,
     alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    flex: 1,
+    marginLeft: 8,
+    height: 80,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   changePasswordButton: {
     backgroundColor: '#1926E1',
@@ -293,29 +306,59 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 4,
     alignItems: 'center',
-  },
-  changePasswordButtonText: {
-    color: '#fff',
+    flex: 1,
     fontSize: 20,
+    marginRight: 8,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  buttonText: {
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 24,
+  },
+  logoutButtonContainer: {
+    marginTop: 5,
+  },
+  logoutButton: {
+    backgroundColor: '#E11818',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 90,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 28,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
     padding: 20,
-    borderRadius: 8,
-    alignItems: 'center',
+    borderRadius: 10,
+    width: '80%',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   modalInput: {
     height: 50,
@@ -325,35 +368,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 4,
     fontSize: 17,
-    width: '100%',
-  },
-  submitButton: {
-    backgroundColor: 'green',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  closeButton: {
-    backgroundColor: '#ccc',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: 'bold',
+    backgroundColor: '#fff',
   },
   modalButtonRow: {
     flexDirection: 'row',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  closeButton: {
+    backgroundColor: '#E11818',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 4,
+  },
+  submitButton: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 4,
   },
 });
